@@ -14,7 +14,6 @@ The firmware can be updated over USB by pressing CTRL-Y in the text editor to en
 
 Once in bootloader mode, you can update the firmware by dragging and dropping a new UF2 file to the device.
 
-```
 You can build the firmware from source, if you have the RP2040 toolchain installed:
 
 ```
