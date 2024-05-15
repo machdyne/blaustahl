@@ -68,22 +68,31 @@ void blaustahl_task() {
 
 	uint32_t len = tud_vendor_read(buf, 64);
 
-	/*
+/*
 	char tmp[256];
 	sprintf(tmp, "RX %d bytes from host\r\n", len);
 	tud_cdc_write_str(tmp);
 	sprintf(tmp, "[%x %x %x %x]\r\n", buf[0], buf[1], buf[2], buf[3]);
 	tud_cdc_write_str(tmp);
 	tud_cdc_write_flush();
-	*/
+*/
 
 	if (buf[0] == BS_CMD_NOP) {
 	}
 
-	if (buf[0] == BS_CMD_READ) {
+	if (buf[0] == BS_CMD_READ_BYTE) {
+		int addr = buf[1] << 8 | buf[2];
+      uint8_t lbuf[64];
+      bzero(lbuf, 64);
+		fram_read(lbuf, addr, 1);
+      tud_vendor_write(lbuf, 64);
+      tud_vendor_flush();
 	}
 
-	if (buf[0] == BS_CMD_WRITE) {
+	if (buf[0] == BS_CMD_WRITE_BYTE) {
+		int addr = buf[1] << 8 | buf[2];
+		fram_write_enable();
+		fram_write(addr, buf[3]);
 	}
 
 }

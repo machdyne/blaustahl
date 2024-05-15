@@ -19,9 +19,9 @@ void blaustahl_dfu(void);
 
 // USB VENDOR CLASS COMMANDS
 
-#define BS_CMD_NOP		0x00
-#define BS_CMD_WRITE		0x20	// <memtype:8> <len:16> <data:64>
-#define BS_CMD_READ		0x30	// <memtype:8> <len:16> <data:64>
+#define BS_CMD_NOP			0x00
+#define BS_CMD_WRITE_BYTE	0x21	// <cmd> <addr:16> <data:8>
+#define BS_CMD_READ_BYTE	0x31	// <cmd> <addr:16>
 
 // PINS
 

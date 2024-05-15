@@ -8,6 +8,20 @@ This repo contains schematics, firmware and a 3D-printable case.
 
 Find usage instructions and more information on the [Blaustahl product page](https://machdyne.com/product/blaustahl-storage-device/).
 
+## Software
+
+The 'bs' utility program can be used to read and write the FRAM data.
+
+Build and install:
+
+```
+$ sudo apt install libusb-1.0-0-dev
+$ cd sw
+$ make
+$ sudo make install
+$ sudo bs -r my-backup.bin
+```
+
 ## Firmware
 
 The firmware can be updated over USB by pressing CTRL-Y in the text editor to enter the UF2 bootloader mode. You can also enter the bootloader by holding the button while plugging in the device.
