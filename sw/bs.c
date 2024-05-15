@@ -32,23 +32,19 @@ struct libusb_device_handle *usb_dh = NULL;
 void show_usage(char **argv);
 
 void show_usage(char **argv) {
-   printf("usage: %s [-harw] [-a <bus> <addr>] <image.bin>\n" \
+   printf("usage: %s [-harwv] [-a <bus> <addr>] <image.bin>\n" \
       " -h\tdisplay help\n" \
-      " -r\tread from device to <image.bin>\n" \
-      " -w\twrite <image.bin> to device\n" \
+      " -r\tread from FRAM to <image.bin>\n" \
+      " -w\twrite <image.bin> to FRAM\n" \
+      " -v\tverify <image.bin> with FRAM\n" \
       " -a\tusb bus and address are specified as first arguments\n" \
       " -d\tdebug mode\n",
       argv[0]);
 }
 
-#define MEM_TYPE_NONE 0
-#define MEM_TYPE_TEST 1
-#define MEM_TYPE_SRAM 2
-#define MEM_TYPE_FLASH 3
-
 #define MODE_NONE 0
 #define MODE_READ 1
-#define MODE_WRITE 3
+#define MODE_WRITE 2
 #define MODE_VERIFY 3
 
 #define OPTION_NONE 0
@@ -62,11 +58,12 @@ int main(int argc, char *argv[]) {
 	int mode = MODE_NONE;
 	int options = 0;
 
-   while ((opt = getopt(argc, argv, "harwd")) != -1) {
+   while ((opt = getopt(argc, argv, "harwvd")) != -1) {
       switch (opt) {
          case 'h': show_usage(argv); return(0); break;
          case 'r': mode = MODE_READ; break;
          case 'w': mode = MODE_WRITE; break;
+         case 'v': mode = MODE_VERIFY; break;
          case 'a': options |= OPTION_ADDR; break;
          case 'd': debug = 1; break;
       }
@@ -168,25 +165,22 @@ int main(int argc, char *argv[]) {
 
 	if (mode == MODE_WRITE) {
 
-		printf("writing %i bytes ...\n", len);
+		printf("writing %i bytes to FRAM ...\n", len);
 
 		for (int i = 0; i < len; i++) {
-			printf("writing byte %i\n", i);
 			fram_write_byte(i, buf[i]);
 		}
 		printf("done writing.\n");
 
 	} else if (mode == MODE_READ) {
 
-		printf("reading flash to %s ...\n", argv[optind]);
+		printf("reading %i bytes from FRAM to %s ...\n", BS_FRAM_SIZE,
+			argv[optind]);
 
 		char fbuf[1];
 		fp = fopen(argv[optind], "w");
 
-		printf("reading %i bytes\n", BS_FRAM_SIZE);
-
 		for (int i = 0; i < BS_FRAM_SIZE; i++) {
-			printf("reading byte %i\n", i);
 			uint8_t d = fram_read_byte(i);
 			fbuf[0] = d;
 			fwrite(fbuf, 1, 1, fp);
@@ -194,6 +188,22 @@ int main(int argc, char *argv[]) {
 		printf("done reading.\n");
 
 		fclose(fp);
+
+	} else if (mode == MODE_VERIFY) {
+
+		printf("verifying %i bytes from FRAM with %s ...\n", BS_FRAM_SIZE,
+			argv[optind]);
+
+		int mismatches = 0;
+
+		for (int i = 0; i < BS_FRAM_SIZE; i++) {
+			uint8_t d = fram_read_byte(i);
+			if (d != buf[i]) {
+				printf("mismatch at address 0x%.4x\r\n", i);
+				++mismatches;
+			}
+		}
+		printf("%i mismatches.\n", mismatches);
 
 	}
 
@@ -227,6 +237,7 @@ uint8_t fram_read_byte(uint16_t addr) {
 	bsCmd(BS_CMD_READ_BYTE, (addr >> 8) & 0xff, addr & 0xff, 0);
    libusb_bulk_transfer(usb_dh, (2 | LIBUSB_ENDPOINT_IN), buf, 64,
       &actual, 0);
-	printf("read %i bytes [%.2x]\n", actual, buf[0]);
+	if (debug)
+		printf("read %i bytes [%.2x]\n", actual, buf[0]);
 	return buf[0];
 }
