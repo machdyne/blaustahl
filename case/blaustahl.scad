@@ -1,6 +1,13 @@
-// BLAUSTAHL CASE
-// Copyright (c) 2024 Lone Dynamics Corporation. All rights reserved.
-
+/*
+ * Blaustahl Case
+ * Copyright (c) 2024 Lone Dynamics Corporation. All rights reserved.
+ *
+ * required hardware:
+ *  - 1 x M2.5 x 10mm countersunk bolt
+ *  - 1 x M2.5 nut
+ *
+ */
+ 
 $fn = 30;
 
 box_width = 18;
