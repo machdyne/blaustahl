@@ -38,6 +38,10 @@ $ cmake ..
 $ make
 ```
 
+## Future data recovery
+
+In the event that the USB interface were to become obsolete or the RP2040 were to become non-functional, it should still be possible to recover the FRAM data using a SOP-8 test clip. The FRAM IC is marked "RS64".
+
 ## License
 
 The contents of this repo are released under the [Lone Dynamics Open License](LICENSE.md).
