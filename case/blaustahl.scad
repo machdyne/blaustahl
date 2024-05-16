@@ -12,7 +12,7 @@ lid_thickness = 3;
 
 cutout_width = 16.10;
 cutout_length = 33.60;
-cutout_height = 8;
+cutout_height = 8.5;
 
 cutout_usb_width = 12;
 
@@ -35,7 +35,7 @@ module ldp_spacer(o)
 {
 	difference() {
 		union() {
-			translate([0,-13.5,o-0.75]) color([0,0,1]) cylinder(d=6, h=2.75, $fn=36);
+			translate([0,-13.5,o-0.75]) color([0,0,1]) cylinder(d=6, h=3, $fn=36);
 			translate([0,-13.5,o-2.3]) color([0,0,1]) cylinder(d=4, h=2.5, $fn=36);
 		}
 		translate([0,-13.5,-4.25]) color([1,0,0]) cylinder(d=3, h=8, $fn=36);
@@ -92,7 +92,7 @@ module ldp_case()
 
 	// board support
 	translate([0,0,-3])
-		cube([16,16,1.75], center=true);
+		cube([16,16,2.25], center=true);
 
 	difference() {
 		
