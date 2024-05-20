@@ -42,6 +42,8 @@ $ make
 
 In the event that the USB interface were to become obsolete or the RP2040 were to become non-functional, it should still be possible to recover the FRAM data using a SOP-8 test clip. The FRAM IC is marked "RS64".
 
+One way to achieve this today is to load the Blaustahl firmware onto a Raspberry Pi Pico using the same SPI GPIOs as shown in the schematics, then hold the Blaustahl boot button while attaching a test clip. The text editor or 'bs' utility can then be used to recover the FRAM data.
+
 ## License
 
 The contents of this repo are released under the [Lone Dynamics Open License](LICENSE.md).
