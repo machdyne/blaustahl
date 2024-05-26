@@ -139,7 +139,9 @@ int main(void) {
 
 		tight_loop_contents();
 		tud_task();
+#ifndef CDCONLY
 		blaustahl_task();
+#endif
 
 	}
 

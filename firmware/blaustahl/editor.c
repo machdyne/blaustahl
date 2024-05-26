@@ -52,7 +52,7 @@
 #define KEY_SIZE 256
 
 const char blaustahl_banner[] =
-	"BLAUSTAHL FIRMWARE V%s\r\n"
+	"BLAUSTAHL FIRMWARE V%s %s\r\n"
 	"Copyright (c) 2024 Lone Dynamics Corporation. All rights reserved.\r\n"
 	"\r\n";
 
@@ -186,7 +186,11 @@ void editor_help(void) {
 	cdc_print(VT100_CLEAR_HOME);
 	cdc_print(VT100_ERASE_SCREEN);
 
-	cdc_printf(blaustahl_banner, BLAUSTAHL_VERSION);
+#ifdef CDCONLY
+	cdc_printf(blaustahl_banner, BLAUSTAHL_VERSION, "CDCONLY");
+#else
+	cdc_printf(blaustahl_banner, BLAUSTAHL_VERSION, "COMPOSITE");
+#endif
 
 	cdc_print(help_editor);
 	cdc_print(help_press_any_key);
