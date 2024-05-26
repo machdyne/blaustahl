@@ -55,6 +55,8 @@ $ screen /dev/tty.usbmodem1234561
 
 Note: The default firmware isn't currently recognized by Windows, please [update your firmware](#firmware) to [blaustahl_cdconly.uf2](firmware) in order to access Blaustahl from Windows.
 
+After the latest cdconly firmware is installed:
+
 1. Download and install [PuTTY](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html).
 
 2. After plugging in Blaustahl, find the device by opening Device Manager and looking under "Ports (COM & LPT)" for "USB Serial Device (COMx)".
