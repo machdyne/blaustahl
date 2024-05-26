@@ -9,7 +9,7 @@ This repo contains schematics, firmware and a 3D-printable case.
 Find usage instructions and more information on the [Blaustahl product page](https://machdyne.com/product/blaustahl-storage-device/).
 
 
-## Using Blaustahl
+## Connecting Blaustahl
 
 The following sections will describe how to connect to Blaustahl on different operating systems. Once you're connected, press CTRL-G to view the on-device help screen.
 
@@ -62,6 +62,21 @@ After the latest cdconly firmware is installed:
 2. After plugging in Blaustahl, find the device by opening Device Manager and looking under "Ports (COM & LPT)" for "USB Serial Device (COMx)".
 
 3. Open PuTTY and set connection type to Serial. Enter COMx (e.g. COM4) in the serial line box and press the Open button.
+
+## Using Blaustahl
+
+Blaustahl includes a built-in text editor with four 80x24 pages of text. The cursor can be moved with the arrow keys. When you'd like to enter or delete text, press CTRL-W to toggle the write mode.
+
+| Keypress | Action |
+| -------- | ------ |
+| CTRL-G | Help |
+| CTRL-L | Refresh screen |
+| CTRL-W | Toggle write mode |
+| CTRL-S | Toggle status bar |
+| CTRL-Y | Enter firmware update mode |
+| PGUP/DN | Navigate between pages |
+| $ | Move to end of line |
+| ^ | Move to beginning of line |
 
 ## Software
 
