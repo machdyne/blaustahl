@@ -53,7 +53,7 @@ $ screen /dev/tty.usbmodem1234561
 
 ### Windows
 
-Note: The default firmware isn't currently recognized by Windows, please [update your firmware](#firmware) to [blaustahl_cdconly.uf2](tree/main/firmware) in order to access Blaustahl from Windows.
+Note: The default firmware isn't currently recognized by Windows, please [update your firmware](#firmware) to [blaustahl_cdconly.uf2](firmware) in order to access Blaustahl from Windows.
 
 1. Download and install [PuTTY](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html).
 
@@ -77,7 +77,7 @@ $ sudo bs -r my-backup.bin
 
 ## Firmware
 
-The [firmware](tree/main/firmware) can be updated over USB by pressing CTRL-Y in the text editor to enter the UF2 bootloader mode. You can also enter the bootloader by holding the button while plugging in the device.
+The [firmware](firmware) can be updated over USB by pressing CTRL-Y in the text editor to enter the UF2 bootloader mode. You can also enter the bootloader by holding the button while plugging in the device.
 
 Once in bootloader mode, you can update the firmware by dragging and dropping a new UF2 file to the device.
 
