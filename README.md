@@ -83,6 +83,14 @@ The [firmware](firmware) can be updated over USB by pressing CTRL-Y in the text 
 
 Once in bootloader mode, you can update the firmware by dragging and dropping a new UF2 file to the device.
 
+There are two firmware images available:
+
+  * blaustahl.uf2: USB composite device with USB-CDC and vendor interface
+  * blaustahl\_cdconly.uf2: USB-CDC simple device
+
+The vendor interface allows you to access the 'bs' utility and to develop custom
+software that interfaces with Blaustahl.
+
 You can build the firmware from source, if you have the RP2040 toolchain installed:
 
 ```
