@@ -15,11 +15,11 @@ The following sections will describe how to connect to Blaustahl on different op
 
 ### Linux
 
-1. Install 'screen' or 'minicom':
+1. Install screen or minicom:
 
 ```
-$ apt install screen
-$ apt install minicom
+$ sudo apt install screen
+$ sudo apt install minicom
 ```
 
 2. After plugging in Blaustahl, find the device:
