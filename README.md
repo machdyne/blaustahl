@@ -91,7 +91,7 @@ There are two firmware images available:
 The vendor interface allows you to access the 'bs' utility and to develop custom
 software that interfaces with Blaustahl.
 
-You can build the firmware from source, if you have the RP2040 toolchain installed:
+You can build the firmware from source, if you have [pico-sdk](https://github.com/raspberrypi/pico-sdk) installed:
 
 ```
 $ cd firmware/blaustahl
