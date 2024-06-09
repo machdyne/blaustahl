@@ -334,8 +334,6 @@ void editor_yield(void) {
 					cdc_print(VT100_CURSOR_LEFT);
 					cdc_print(".");
 					cdc_print(VT100_CURSOR_LEFT);
-					cdc_print(VT100_CURSOR_LEFT);
-					cdc_print(VT100_CURSOR_LEFT);
 //				} else if (c == CH_DLE) {
 //					editor_set_password();
 				} else if (c == CH_CR) {
