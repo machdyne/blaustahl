@@ -32,8 +32,11 @@ $ dmesg | grep ACM
 
 ```
 $ screen /dev/ttyACM0
+or
 $ minicom -D /dev/ttyACM0
 ```
+
+If the device is already plugged in and you see nothing, you may need to press CTRL-L to refresh the display.
 
 ### OS X
 
