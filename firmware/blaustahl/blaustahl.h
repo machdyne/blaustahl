@@ -7,7 +7,7 @@
 #ifndef BLAUSTAHL_H_
 #define BLAUSTAHL_H_
 
-#define BLAUSTAHL_VERSION "0.0.4"
+#define BLAUSTAHL_VERSION "0.0.5"
 
 int cdc_getchar(void);
 void cdc_print(const char *str);

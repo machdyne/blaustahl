@@ -27,18 +27,22 @@
 #define VT100_ERASE_SCREEN		"\e[J"
 #define VT100_ERASE_LINE		"\e[K"
 
-#define CH_ESC		0x1b
-#define CH_LF		0x0a
-#define CH_CR		0x0d
-#define CH_FF		0x0c
+#define CH_SOH		0x01	// CTRL-A
+#define CH_ENQ		0x05	// CTRL-E
 #define CH_ACK		0x06
 #define CH_BEL		0x07
 #define CH_BS		0x08
+#define CH_LF		0x0a
+#define CH_CR		0x0d
+#define CH_FF		0x0c
 #define CH_DLE		0x10
+#define CH_DC1		0x11
 #define CH_DC3		0x13
-#define CH_DEL		0x7f
 #define CH_ETB		0x17
+#define CH_CAN		0x18
 #define CH_EM		0x19
+#define CH_ESC		0x1b
+#define CH_DEL		0x7f
 
 #define MODE_EDIT 1
 #define MODE_HELP 2
@@ -71,7 +75,7 @@ const char help_editor[] =
 	"CTRL-G    HELP\r\n"
 	"CTRL-L    REFRESH SCREEN\r\n"
 	"CTRL-W    TOGGLE WRITE MODE\r\n"
-	"CTRL-S    TOGGLE STATUS BAR\r\n"
+	"CTRL-S/Q  TOGGLE STATUS BAR\r\n"
 //	"CTRL-P    SET ENCRYPTION PASSWORD\r\n"
 	"CTRL-Y    ENTER FIRMWARE UPDATE MODE\r\n";
 
@@ -328,10 +332,18 @@ void editor_yield(void) {
 				if (c == CH_BS || c == CH_DEL) {
 					if (!write_enabled) break;
 					x--;
+					if (!x) break;
 					int addr = ((page - 1) * PAGE_SIZE) + ((y - 1) * COLS) + (x - 1);
 					blaustahl_led(LED_WRITE);
 					fram_write(addr, editor_encode(addr, 0x00));
 					cdc_print(VT100_CURSOR_LEFT);
+					cdc_print(".");
+					cdc_print(VT100_CURSOR_LEFT);
+				} else if (c == CH_CAN) {
+					if (!write_enabled) break;
+					int addr = ((page - 1) * PAGE_SIZE) + ((y - 1) * COLS) + (x - 1);
+					blaustahl_led(LED_WRITE);
+					fram_write(addr, editor_encode(addr, 0x00));
 					cdc_print(".");
 					cdc_print(VT100_CURSOR_LEFT);
 //				} else if (c == CH_DLE) {
@@ -349,13 +361,17 @@ void editor_yield(void) {
 						write_enabled = false;
 					else
 						write_enabled = true;
-				} else if (c == CH_DC3) {
+				} else if (c == CH_DC1 || c == CH_DC3) {
 					if (status_enabled) {
 						status_enabled = false;
 						redraw = true;
 					} else {
 						status_enabled = true;
 					}
+				} else if (c == CH_SOH) {
+					x = 0;
+				} else if (c == CH_ENQ) {
+					x = COLS;
 				} else {
 					if (write_enabled) {
 						cdc_putchar(c);
