@@ -78,8 +78,8 @@ Blaustahl includes a built-in text editor with four 80x24 pages of text. The cur
 | CTRL-S | Toggle status bar |
 | CTRL-Y | Enter firmware update mode |
 | PGUP/DN | Navigate between pages |
-| $ | Move to end of line |
-| ^ | Move to beginning of line |
+| CTRL-A or ^ | Move to beginning of line |
+| CTRL-E or $ | Move to end of line |
 
 ## Software
 
@@ -87,8 +87,19 @@ The 'bs' utility program can be used to read and write the FRAM data. Note that 
 
 Build and install:
 
+If using OS X:
+```
+$ brew install libusb
+```
+
+If using Linux:
 ```
 $ sudo apt install libusb-1.0-0-dev
+```
+
+Then:
+
+```
 $ cd sw
 $ make
 $ sudo make install
