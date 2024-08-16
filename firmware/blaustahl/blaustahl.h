@@ -7,7 +7,7 @@
 #ifndef BLAUSTAHL_H_
 #define BLAUSTAHL_H_
 
-#define BLAUSTAHL_VERSION "0.0.5"
+#define BLAUSTAHL_VERSION "0.1.0"
 
 int cdc_getchar(void);
 void cdc_print(const char *str);
@@ -33,7 +33,7 @@ void blaustahl_dfu(void);
 #define BS_FRAM_SS		13
 #define BS_FRAM_SCK		14
 
-// LED SETTINGS
+// LED PWM SETTINGS
 
 #define LED_STARTUP 100
 #define LED_IDLE 0

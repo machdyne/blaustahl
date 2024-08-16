@@ -51,7 +51,7 @@ void fram_write_enable(void) {
 
 }
 
-void fram_write(int addr, unsigned char d) {
+void fram_write_byte(int addr, unsigned char d) {
 
 	uint8_t cmdbuf[4] = { 0x02, addr >> 8, addr & 0xff, d };	// WRITE
 
@@ -59,6 +59,19 @@ void fram_write(int addr, unsigned char d) {
 
 	gpio_put(BS_FRAM_SS, 0);
 	spi_write_blocking(BS_FRAM_SPI, cmdbuf, 4);
+	gpio_put(BS_FRAM_SS, 1);
+
+}
+
+void fram_write(int addr, char *buf, int len) {
+
+	uint8_t cmdbuf[3] = { 0x02, addr >> 8, addr & 0xff };	// WRITE
+
+	fram_write_enable(); // auto-disabled after each write
+
+	gpio_put(BS_FRAM_SS, 0);
+	spi_write_blocking(BS_FRAM_SPI, cmdbuf, 3);
+	spi_write_blocking(BS_FRAM_SPI, buf, len);
 	gpio_put(BS_FRAM_SS, 1);
 
 }

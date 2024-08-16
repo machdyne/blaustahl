@@ -92,7 +92,7 @@ void blaustahl_task() {
 	if (buf[0] == BS_CMD_WRITE_BYTE) {
 		int addr = buf[1] << 8 | buf[2];
 		fram_write_enable();
-		fram_write(addr, buf[3]);
+		fram_write_byte(addr, buf[3]);
 	}
 
 }

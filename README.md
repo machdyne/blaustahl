@@ -70,16 +70,26 @@ After the latest cdconly firmware is installed:
 
 Blaustahl includes a built-in text editor with four 80x24 pages of text. The cursor can be moved with the arrow keys. When you'd like to enter or delete text, press CTRL-W to toggle the write mode.
 
+There is also a buffered mode where you can edit text, and then write the buffer to FRAM by pressing CTRL-W. When encryption is enabled, only the buffered mode is supported.
+
 | Keypress | Action |
 | -------- | ------ |
 | CTRL-G | Help |
 | CTRL-L | Refresh screen |
-| CTRL-W | Toggle write mode |
+| CTRL-B | Toggle direct mode / buffered mode |
+| CTRL-W | Toggle write mode / write buffer |
 | CTRL-S | Toggle status bar |
+| CTRL-C | Enter command line interface mode |
 | CTRL-Y | Enter firmware update mode |
 | PGUP/DN | Navigate between pages |
 | CTRL-A or ^ | Move to beginning of line |
 | CTRL-E or $ | Move to end of line |
+
+## Encryption
+
+Blaustahl has experimental authenticated encryption support that makes use of extra FRAM space to store meta data. When you enable encryption by entering a password, encryption related meta data is generated and stored in FRAM.
+
+Each time you use Blaustahl, you will need to enter your password in order to view and edit text.
 
 ## Software
 
@@ -94,7 +104,7 @@ $ brew install libusb
 
 If using Linux:
 ```
-$ sudo apt install libusb-1.0-0-dev
+$ sudo apt install libusb-1.0-0-dev libmbedtls-dev
 ```
 
 Then:
@@ -116,6 +126,8 @@ There are two firmware images available:
 
   * blaustahl.uf2: USB composite device with USB-CDC and vendor interface
   * blaustahl\_cdconly.uf2: USB-CDC simple device
+
+Firmware version 0.0.x is considered stable and 0.1.x is experimental.
 
 The vendor interface allows you to access the 'bs' utility and to develop custom
 software that interfaces with Blaustahl.
