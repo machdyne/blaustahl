@@ -11,6 +11,7 @@
 #include "blaustahl.h"
 #include "editor.h"
 #include "fram.h"
+#include "srwp.h"
 
 #define ROWS 24
 #define COLS 80
@@ -275,7 +276,11 @@ void editor_yield(void) {
 	int redraw = 0;
 
 	int c = cdc_getchar();
-	if (c <= 0) return;
+	if (c < 0) return;
+	if (c == 0) {
+		srwp();
+		return;
+	}
 
 	if (mode == MODE_HELP) {
 		mode = MODE_EDIT;
