@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "pico/bootrom.h"
+#include "pico/stdio_usb.h"
 #include "tusb.h"
 
 #include "blaustahl.h"
@@ -86,7 +87,7 @@ int cdc_read_buf(uint8_t *buf, int len) {
 }
 
 void cdc_write_buf(uint8_t *buf, int length) {
-    cdc_usb_out_chars((const char *)buf, length);
+	fwrite((const char *)buf, length, 1, stdout);
 	tud_cdc_write_flush();
 }
 

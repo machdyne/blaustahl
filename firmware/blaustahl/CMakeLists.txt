@@ -8,12 +8,14 @@ add_executable(blaustahl
         blaustahl.c
         fram.c
         editor.c
+        srwp.c
         )
 
 add_executable(blaustahl_cdconly
         blaustahl.c
         fram.c
         editor.c
+        srwp.c
         )
 
 target_compile_definitions(blaustahl_cdconly PRIVATE CDCONLY=1)
