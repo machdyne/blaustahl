@@ -33,32 +33,13 @@
 #include "blaustahl.h"
 #include "editor.h"
 #include "fram.h"
-#include "cdc_out.h"
 
 void core1_main(void);
 
 void init_blaustahl(void);
 
+#ifndef CDCONLY
 void blaustahl_task(void);
-
-void cdc_print(const char *str) {
-	cdc_usb_out_chars(str, strlen(str));
-	tud_cdc_write_flush();
-}
-
-void cdc_printf(const char *fmt, ...) {
-   char buf[1024];
-   va_list args;
-   va_start(args, fmt);
-   vsprintf(buf, fmt, args);
-   cdc_print(buf);
-   va_end(args);
-}
-
-void cdc_putchar(const char ch) {
-	tud_cdc_write_char(ch);
-	tud_cdc_write_flush();
-}
 
 void blaustahl_task() {
 
@@ -96,10 +77,11 @@ void blaustahl_task() {
 	}
 
 }
+#endif
 
 void init_blaustahl(void) {
 
-	cdc_printf("init_blaustahl\r\n");
+	printf("init_blaustahl\r\n");
 
 	// init LED
 	gpio_init(BS_LED);
@@ -110,7 +92,6 @@ void init_blaustahl(void) {
 	uint slice_num = pwm_gpio_to_slice_num(BS_LED);
 	pwm_set_wrap(slice_num, 499);
 	pwm_set_chan_level(slice_num, BS_LED, LED_STARTUP);
-	//pwm_set_clkdiv(slice_num, 4);
 	pwm_set_clkdiv_int_frac(slice_num, 250, 0);
 	pwm_set_enabled(slice_num, true);
 
@@ -126,6 +107,9 @@ int main(void) {
 
 	// init tinyusb
 	tud_init(BOARD_TUD_RHPORT);
+
+	// init stdio
+	stdio_usb_init();
 
 	// init hardware
 	init_blaustahl();
@@ -176,6 +160,13 @@ int cdc_getchar(void) {
 			return(EOF);
 	} else {
 		return(EOF);
+	}
+}
+
+void cdc_putchar(const char ch) {
+	if (tud_cdc_connected() && tud_cdc_write_available()) {
+		tud_cdc_write_char(ch);
+		tud_cdc_write_flush();
 	}
 }
 

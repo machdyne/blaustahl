@@ -7,11 +7,9 @@
 #ifndef BLAUSTAHL_H_
 #define BLAUSTAHL_H_
 
-#define BLAUSTAHL_VERSION "0.0.5"
+#define BLAUSTAHL_VERSION "0.0.6"
 
 int cdc_getchar(void);
-void cdc_print(const char *str);
-void cdc_printf(const char *fmt, ...);
 void cdc_putchar(const char ch);
 
 void blaustahl_led(uint16_t intensity);

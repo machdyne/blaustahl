@@ -116,8 +116,8 @@ uint8_t key[KEY_SIZE];
 
 void editor_init(void) {
 
-	cdc_print(VT100_CLEAR_HOME);
-	cdc_print(VT100_ERASE_SCREEN);
+	printf(VT100_CLEAR_HOME);
+	printf(VT100_ERASE_SCREEN);
 
 	page = 1;
 	x = 1;
@@ -130,15 +130,15 @@ void editor_init(void) {
 void editor_redraw(void) {
 	char buf[COLS];
 	editor_status();
-	cdc_printf(VT100_CURSOR_MOVE_TO, 24, 59);
-	cdc_print("PRESS CTRL-G FOR HELP");
+	printf(VT100_CURSOR_MOVE_TO, 24, 59);
+	printf("PRESS CTRL-G FOR HELP");
 
 	blaustahl_led(LED_READ);
 
 	for (int y = 0; y < ROWS; y++) {
 		if (status_enabled && y == ROWS - 1) continue;
 		fram_read(buf, ((page - 1) * PAGE_SIZE) + (y * COLS), COLS);
-		cdc_printf(VT100_CURSOR_MOVE_TO, y + 1, 1);
+		printf(VT100_CURSOR_MOVE_TO, y + 1, 1);
 		for (int x = 0; x < COLS; x++) {
 			char pc = editor_decode(y * COLS + x, buf[x]);
 			if (pc > 0x1f && pc < 0x7f)
@@ -148,17 +148,17 @@ void editor_redraw(void) {
 		}
 	}
 
-	cdc_printf(VT100_CURSOR_MOVE_TO, y, x);
+	printf(VT100_CURSOR_MOVE_TO, y, x);
 	fflush(stdout);
 }
 
 void editor_status(void) {
 	if (!status_enabled) return;
-	cdc_printf(VT100_CURSOR_MOVE_TO, 24, 1);
-	cdc_printf("BLAUSTAHL -- Page %i Line %.2i Column %.2i -- ", page, y, x);
-	if (write_enabled) cdc_printf("READ-WRITE"); else cdc_printf("READ-ONLY");
-	cdc_print("  ");
-	cdc_printf(VT100_CURSOR_MOVE_TO, y, x);
+	printf(VT100_CURSOR_MOVE_TO, 24, 1);
+	printf("BLAUSTAHL -- Page %i Line %.2i Column %.2i -- ", page, y, x);
+	if (write_enabled) printf("READ-WRITE"); else printf("READ-ONLY");
+	printf("  ");
+	printf(VT100_CURSOR_MOVE_TO, y, x);
 	fflush(stdout);
 }
 
@@ -188,17 +188,17 @@ void editor_help(void) {
 
 	mode = MODE_HELP;
 
-	cdc_print(VT100_CLEAR_HOME);
-	cdc_print(VT100_ERASE_SCREEN);
+	printf(VT100_CLEAR_HOME);
+	printf(VT100_ERASE_SCREEN);
 
 #ifdef CDCONLY
-	cdc_printf(blaustahl_banner, BLAUSTAHL_VERSION, "CDCONLY");
+	printf(blaustahl_banner, BLAUSTAHL_VERSION, "CDCONLY");
 #else
-	cdc_printf(blaustahl_banner, BLAUSTAHL_VERSION, "COMPOSITE");
+	printf(blaustahl_banner, BLAUSTAHL_VERSION, "COMPOSITE");
 #endif
 
-	cdc_print(help_editor);
-	cdc_print(help_press_any_key);
+	printf(help_editor);
+	printf(help_press_any_key);
 
 }
 
@@ -206,27 +206,27 @@ void editor_set_password(void) {
 
 	char password[16];
 
-	cdc_print(VT100_CLEAR_HOME);
-	cdc_print(VT100_ERASE_SCREEN);
+	printf(VT100_CLEAR_HOME);
+	printf(VT100_ERASE_SCREEN);
 
-	cdc_print(help_password);
+	printf(help_password);
 
-	cdc_print("Password (0-15 characters): ");
+	printf("Password (0-15 characters): ");
 	readline(password, 15);
 
-	cdc_print("\r\n");
-	cdc_print("\r\n");
+	printf("\r\n");
+	printf("\r\n");
 
 	mode = MODE_HELP;
 
 	if (!strlen(password)) {
-		cdc_print("ENCRYPTION DISABLED.\r\n");
+		printf("ENCRYPTION DISABLED.\r\n");
 		encryption_enabled = false;
 	} else {
-		cdc_printf("SETTING PASSWORD TO: '%s'\r\n", password);
+		printf("SETTING PASSWORD TO: '%s'\r\n", password);
 	}
 
-	cdc_print(help_press_any_key);
+	printf(help_press_any_key);
 
 	if (!strlen(password)) return;
 
@@ -252,10 +252,10 @@ void readline(char *buf, int maxlen) {
 		else if (c == CH_BS || c == CH_DEL) {
 			pl--;
 			buf[pl] = 0x00;
-			cdc_print(VT100_CURSOR_LEFT);
-			cdc_print(" ");
-			cdc_print(VT100_CURSOR_LEFT);
-			cdc_print(VT100_CURSOR_LEFT);
+			printf(VT100_CURSOR_LEFT);
+			printf(" ");
+			printf(VT100_CURSOR_LEFT);
+			printf(VT100_CURSOR_LEFT);
 		}
 		else if (c > 0) {
 			cdc_putchar(c);
@@ -276,7 +276,8 @@ void editor_yield(void) {
 	int redraw = 0;
 
 	int c = cdc_getchar();
-	if (c < 0) return;
+
+  if (c == EOF) return;
 	if (c == 0) {
 		srwp();
 		return;
@@ -284,8 +285,8 @@ void editor_yield(void) {
 
 	if (mode == MODE_HELP) {
 		mode = MODE_EDIT;
-		cdc_print(VT100_ERASE_SCREEN);
-		cdc_print(VT100_CLEAR_HOME);
+		printf(VT100_ERASE_SCREEN);
+		printf(VT100_CLEAR_HOME);
 		editor_redraw();
 		return;
 	}
@@ -308,12 +309,12 @@ void editor_yield(void) {
 		default:
 			if (state == STATE_ESC1) {
 				state = STATE_NONE;
-				if (c == 'A') { y--; cdc_print(VT100_CURSOR_UP); }
-				if (c == 'B') { y++; cdc_print(VT100_CURSOR_DOWN); } 
-				if (c == 'C') { x++; cdc_print(VT100_CURSOR_RIGHT); }
-				if (c == 'D') { x--; cdc_print(VT100_CURSOR_LEFT); }
-				if (c == 'H') { x = 1; cdc_print(VT100_CURSOR_HOME); }
-				if (c == 'F') { x = COLS; cdc_printf(VT100_CURSOR_MOVE_TO, y, x); }
+				if (c == 'A') { y--; printf(VT100_CURSOR_UP); }
+				if (c == 'B') { y++; printf(VT100_CURSOR_DOWN); } 
+				if (c == 'C') { x++; printf(VT100_CURSOR_RIGHT); }
+				if (c == 'D') { x--; printf(VT100_CURSOR_LEFT); }
+				if (c == 'H') { x = 1; printf(VT100_CURSOR_HOME); }
+				if (c == 'F') { x = COLS; printf(VT100_CURSOR_MOVE_TO, y, x); }
 				if (c == '5') { page--; redraw = 1; state = STATE_ESC2; }
 				if (c == '6') { page++; redraw = 1; state = STATE_ESC2; }
 				if (c == '3') {
@@ -321,8 +322,8 @@ void editor_yield(void) {
 					int addr = ((page - 1) * PAGE_SIZE) + ((y - 1) * COLS) + (x - 1);
 					blaustahl_led(LED_WRITE);
 					fram_write(addr, editor_encode(addr, 0x00));
-					cdc_print(".");
-					cdc_print(VT100_CURSOR_LEFT);
+					printf(".");
+					printf(VT100_CURSOR_LEFT);
 					state = STATE_ESC2;
 				};
 				break;
@@ -341,20 +342,20 @@ void editor_yield(void) {
 					int addr = ((page - 1) * PAGE_SIZE) + ((y - 1) * COLS) + (x - 1);
 					blaustahl_led(LED_WRITE);
 					fram_write(addr, editor_encode(addr, 0x00));
-					cdc_print(VT100_CURSOR_LEFT);
-					cdc_print(".");
-					cdc_print(VT100_CURSOR_LEFT);
+					printf(VT100_CURSOR_LEFT);
+					printf(".");
+					printf(VT100_CURSOR_LEFT);
 				} else if (c == CH_CAN) {
 					if (!write_enabled) break;
 					int addr = ((page - 1) * PAGE_SIZE) + ((y - 1) * COLS) + (x - 1);
 					blaustahl_led(LED_WRITE);
 					fram_write(addr, editor_encode(addr, 0x00));
-					cdc_print(".");
-					cdc_print(VT100_CURSOR_LEFT);
+					printf(".");
+					printf(VT100_CURSOR_LEFT);
 //				} else if (c == CH_DLE) {
 //					editor_set_password();
 				} else if (c == CH_CR) {
-					cdc_print(VT100_CURSOR_CRLF);
+					printf(VT100_CURSOR_CRLF);
 					x = 1;
 					y += 1;
 				} else if (c == CH_BEL) {
