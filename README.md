@@ -56,15 +56,13 @@ $ screen /dev/tty.usbmodem1234561
 
 ### Windows
 
-Note: The default firmware isn't currently recognized by Windows, please [update your firmware](#firmware) to [blaustahl_cdconly.uf2](firmware) in order to access Blaustahl from Windows.
-
-After the latest cdconly firmware is installed:
-
 1. Download and install [PuTTY](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html).
 
 2. After plugging in Blaustahl, find the device by opening Device Manager and looking under "Ports (COM & LPT)" for "USB Serial Device (COMx)".
 
 3. Open PuTTY and set connection type to Serial. Enter COMx (e.g. COM4) in the serial line box and press the Open button.
+
+Note: The default firmware on older devices isn't recognized by Windows, if that is the case please [update your firmware](#firmware) to [blaustahl_cdconly.uf2](firmware) in order to access Blaustahl from Windows. If you ordered Blaustahl recently the cdc\_only firmware will be installed by default and should be recognized by Windows.
 
 ## Using Blaustahl
 
@@ -83,7 +81,7 @@ Blaustahl includes a built-in text editor with four 80x24 pages of text. The cur
 
 ## Software
 
-The 'bs' utility program can be used to read and write the FRAM data. Note that it's not possible to use this utility with the cdconly firmware.
+The 'bs' utility program can be used to read and write the FRAM data. Note that it's not possible to use this utility with the cdconly firmware, please install the composite firmware (blaustahl.uf2) in order to use the `bs` utility.
 
 Build and install:
 
@@ -116,6 +114,8 @@ There are two firmware images available:
 
   * blaustahl.uf2: USB composite device with USB-CDC and vendor interface
   * blaustahl\_cdconly.uf2: USB-CDC simple device
+
+Blaustahl ships with blaustahl\_cdconly.uf2 installed.
 
 The vendor interface allows you to access the 'bs' utility and to develop custom
 software that interfaces with Blaustahl.
