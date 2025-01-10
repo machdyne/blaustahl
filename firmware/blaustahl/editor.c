@@ -16,6 +16,7 @@
 #define ROWS 24
 #define COLS 80
 #define PAGE_SIZE (ROWS * COLS)
+#define PAGES 4
 
 #define VT100_CURSOR_UP			"\e[A"
 #define VT100_CURSOR_DOWN		"\e[B"
@@ -77,7 +78,6 @@ const char help_editor[] =
 	"CTRL-L    REFRESH SCREEN\r\n"
 	"CTRL-W    TOGGLE WRITE MODE\r\n"
 	"CTRL-S/Q  TOGGLE STATUS BAR\r\n"
-//	"CTRL-P    SET ENCRYPTION PASSWORD\r\n"
 	"CTRL-Y    ENTER FIRMWARE UPDATE MODE\r\n";
 
 const char help_press_any_key[] =
@@ -87,9 +87,7 @@ const char help_press_any_key[] =
 uint8_t led = LED_IDLE;
 
 void editor(void);
-void editor_set_password(void);
 void readline(char *buf, int maxlen);
-uint32_t xorshift32(uint32_t state[]);
 char editor_encode(int addr, char pc);
 char editor_decode(int addr, char cc);
 void editor_help(void);
@@ -199,40 +197,6 @@ void editor_help(void) {
 
 	printf(help_editor);
 	printf(help_press_any_key);
-
-}
-
-void editor_set_password(void) {
-
-	char password[16];
-
-	printf(VT100_CLEAR_HOME);
-	printf(VT100_ERASE_SCREEN);
-
-	printf(help_password);
-
-	printf("Password (0-15 characters): ");
-	readline(password, 15);
-
-	printf("\r\n");
-	printf("\r\n");
-
-	mode = MODE_HELP;
-
-	if (!strlen(password)) {
-		printf("ENCRYPTION DISABLED.\r\n");
-		encryption_enabled = false;
-	} else {
-		printf("SETTING PASSWORD TO: '%s'\r\n", password);
-	}
-
-	printf(help_press_any_key);
-
-	if (!strlen(password)) return;
-
-	// password ready ...
-
-//	encryption_enabled = true;
 
 }
 
@@ -352,8 +316,6 @@ void editor_yield(void) {
 					fram_write(addr, editor_encode(addr, 0x00));
 					printf(".");
 					printf(VT100_CURSOR_LEFT);
-//				} else if (c == CH_DLE) {
-//					editor_set_password();
 				} else if (c == CH_CR) {
 					printf(VT100_CURSOR_CRLF);
 					x = 1;
@@ -403,7 +365,7 @@ void editor_yield(void) {
 	if (y > ROWS) y = ROWS;
 
 	if (page < 1) page = 1;
-	if (page > 4) page = 4;
+	if (page > PAGES) page = PAGES;
 
 	if (redraw)
 		editor_redraw();
