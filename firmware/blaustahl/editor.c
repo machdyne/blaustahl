@@ -241,7 +241,8 @@ void editor_yield(void) {
 
 	int c = cdc_getchar();
 
-  if (c == EOF) return;
+	if (c == EOF) return;
+
 	if (c == 0) {
 		srwp();
 		return;

@@ -87,7 +87,8 @@ int cdc_read_buf(uint8_t *buf, int len) {
 }
 
 void cdc_write_buf(uint8_t *buf, int length) {
-	fwrite((const char *)buf, length, 1, stdout);
+	for (int i = 0; i < length; i++)
+      tud_cdc_write_char(buf[i]);
 	tud_cdc_write_flush();
 }
 

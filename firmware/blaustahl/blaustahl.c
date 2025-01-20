@@ -37,6 +37,7 @@
 void core1_main(void);
 
 void init_blaustahl(void);
+bool init_done = false;
 
 #ifndef CDCONLY
 void blaustahl_task(void);
@@ -132,8 +133,6 @@ int main(void) {
 	return 0;
 
 }
-
-bool init_done = false;
 
 void core1_main(void) {
 
