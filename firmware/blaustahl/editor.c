@@ -16,7 +16,6 @@
 #define ROWS 24
 #define COLS 80
 #define PAGE_SIZE (ROWS * COLS)
-#define PAGES 4
 
 #define VT100_CURSOR_UP			"\e[A"
 #define VT100_CURSOR_DOWN		"\e[B"

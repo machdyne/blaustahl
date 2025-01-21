@@ -11,6 +11,10 @@
 
 #define BLAUSTAHL_VERSION "0.0.7"
 
+#define PAGES 4
+//#define PAGES 128
+//#define FRAM_BIG
+
 int cdc_getchar(void);
 void cdc_putchar(const char ch);
 
