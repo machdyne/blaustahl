@@ -4,24 +4,22 @@
 import serial
 import time
 import codecs
+import logging
 
 class BlaustahlSRWP:
+    logger = logging.getLogger(__name__)
 
-    def __init__(self):
-        self.srwp = serial.Serial('/dev/ttyACM0', 115200, timeout=1,
-            rtscts=False, dsrdtr=False)
-        #self.srwp.dtr = True
+    def __init__(self, device:str='/dev/ttyACM0', fram_size:int=8192):
+        self.srwp = serial.Serial(device, 115200, timeout=1, rtscts=False, dsrdtr=False)
+        self.fram_size = fram_size
 
     def flush(self):
         while self.srwp.in_waiting:
             data = self.srwp.read(4096)
-            print(data)
+            self.logger.debug(f"Flushed Data: {data}")
 
     def echo(self, msg):
-
         self.flush()
-
-        print("*********")
 
         ba = bytearray()
         ml = len(msg)
@@ -38,24 +36,81 @@ class BlaustahlSRWP:
         print(data)
 
     def read_fram(self, addr, size):
-
+        """
+        Reads `size` bytes from address `addr` on the FRAM chip.
+        :param addr: Target address (4 bytes)
+        :param size: Number of bytes to read
+        """
         self.flush()
 
-        print("*********")
-
         ba = bytearray()
-
         ba.extend(b'\x00')    # Enter SRWP mode
         ba.extend(b'\x01')    # Command: Read FRAM
-        ba.extend(addr.to_bytes(4, byteorder='little'))
-        ba.extend(size.to_bytes(4, byteorder='little'))
+        ba.extend(addr.to_bytes(4, byteorder='little'))    # 4-byte address
+        ba.extend(size.to_bytes(4, byteorder='little'))    # 4-byte size
 
         self.srwp.write(ba)
         self.srwp.flush()
 
         data = self.srwp.read(size)
-        print(data)
+        return data
 
-bs = BlaustahlSRWP()
-bs.echo("this is a test")
-#bs.read_fram(0, 100)
+    def write_fram(self, addr, data):
+        """
+        Writes data to address `addr` on the FRAM chip.
+        :param addr: Target address (4 bytes)
+        :param data: Data to write (bytes or bytearray)
+        """
+        self.flush()
+
+        ba = bytearray()
+        ba.extend(b'\x00')    # Enter SRWP mode
+        ba.extend(b'\x02')    # Command: Write FRAM
+        ba.extend(addr.to_bytes(4, byteorder='little'))    # 4-byte address
+        ba.extend(len(data).to_bytes(4, byteorder='little'))    # Data length
+        ba.extend(data)    # Add data
+
+        self.logger.debug(f"Send to FRAM: {ba.hex()}")
+
+        self.srwp.write(ba)
+        self.srwp.flush()
+
+    def read_fram_all(self):
+        """
+        Reads the entire content of the FRAM chip.
+        :return: All data on the FRAM chip as bytes.
+        """
+        return bs.read_fram(0, self.fram_size)
+
+    def clear_fram(self):
+        """
+        Clears the entire FRAM chip.
+        """
+        for addr in range(self.fram_size + 1):
+            self.write_fram(addr, b'\x00')
+
+# Main program
+if __name__ == "__main__":
+    bs = BlaustahlSRWP(device='/dev/ttyACM0')
+    bs.clear_fram()
+
+    # Echo test
+    bs.echo("This is an echo test")
+
+    # FRAM test: Write and read
+    test_address = 0
+    test_data = b'This is a write test'
+
+    print("\nWriting data to FRAM:")
+    bs.write_fram(test_address, test_data)
+
+    print("\nReading data from FRAM:")
+    read_data = bs.read_fram(test_address, len(test_data))
+
+    # Verify the read data
+    if read_data == test_data:
+        print("\n✅ Data was written and read correctly!")
+    else:
+        print(f"\n❌ Data mismatch! Expected: {test_data.hex()}, Read: {read_data.hex()}")
+
+    print(f"\n{bs.read_fram_all()}")
