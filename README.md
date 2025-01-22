@@ -64,6 +64,40 @@ $ screen /dev/tty.usbmodem1234561
 
 Note: The default firmware on older devices isn't recognized by Windows, if that is the case please [update your firmware](#firmware) to [blaustahl_cdconly.uf2](firmware) in order to access Blaustahl from Windows. If you ordered Blaustahl recently the cdc\_only firmware will be installed by default and should be recognized by Windows.
 
+### Nix Flake Support
+
+For users who prefer Nix, a [Nix Flake](https://nixos.wiki/wiki/Flakes) is now available to simplify building and using Blaustahl's firmware and utility tools. This section offers an alternative method that does not replace the existing instructions for non-Nix environments.
+
+#### Prerequisites:
+- Install [Nix](https://nixos.org/download) and enable flake support by adding `experimental-features = nix-command flakes` to your Nix configuration.
+
+#### Building with the Flake:
+
+Instead of cloning the repository manually, you can reference the flake directly using its GitHub address.
+
+1. Use the flake to build the firmware, `bs` utility, or `srwp` tool:
+
+    - To build and obtain the firmware files:
+      ```bash
+      nix build github:machdyne/blaustahl#firmware
+      ```
+      The UF2 files will be placed in `result/lib/firmware/`.
+
+    - To build the `bs` utility:
+      ```bash
+      nix build github:machdyne/blaustahl#bs
+      ```
+      The binary will be available in the Nix store, with a symlink at `result/bin/bs`.
+
+    - To build the `srwp` tool:
+      ```bash
+      nix build github:machdyne/blaustahl#srwp
+      ```
+      Similarly, you'll find the resulting script or binary under `result/bin/srwp`.
+
+**Note:**
+- These steps are optional for those using Nix and do not affect the regular installation and usage instructions provided above for other environments.
+
 ## Using Blaustahl
 
 Blaustahl includes a built-in text editor with four 80x24 pages of text. The cursor can be moved with the arrow keys. When you'd like to enter or delete text, press CTRL-W to toggle the write mode.
