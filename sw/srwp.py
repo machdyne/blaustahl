@@ -52,7 +52,7 @@ class BlaustahlSRWP:
         data = self.srwp.read(ml)
         print(data)
 
-    def read_fram(self, addr, size):
+    def read_fram(self, addr:int, size:int):
         """
         Reads `size` bytes from address `addr` on the FRAM chip.
         :param addr: Target address (4 bytes)
@@ -72,7 +72,7 @@ class BlaustahlSRWP:
         data = self.srwp.read(size)
         return data
 
-    def write_fram(self, addr, data):
+    def write_fram(self, addr:int, data:bytes|bytearray):
         """
         Writes data to address `addr` on the FRAM chip.
         :param addr: Target address (4 bytes)
