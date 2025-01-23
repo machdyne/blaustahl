@@ -139,7 +139,7 @@ $ sudo bs -r my-backup.bin
 ```
 ## API
 
-To read or write data to flash memory via software, use the built-in API Simple Read Write Protocol (SRWP). An example and description of the protocol can be found in this [repository](https://github.com/binqbit/serialport_srwp).
+To read or write data to FRAM memory via software, use the built-in API Simple Read Write Protocol (SRWP). An example and description of the protocol can be found in this [repository](https://github.com/binqbit/serialport_srwp).
 
 See `sw/srwp.py` for an SRWP example using Python.
 
