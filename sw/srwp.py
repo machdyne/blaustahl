@@ -116,30 +116,36 @@ class BlaustahlSRWP:
 
 # Main program
 if __name__ == "__main__":
+    def run_test(bs:BlaustahlSRWP):
+        bs.clear_fram()
 
-    c = input("This demo will overwrite FRAM, type 'CONTINUE' to continue: ")
-    if c != "CONTINUE": sys.exit()
+        # Echo test
+        bs.echo("This is an echo test")
+
+        # FRAM test: Write and read
+        test_address = 0
+        test_data = b'This is a write test'
+
+        print("\nWriting data to FRAM:")
+        bs.write_fram(test_address, test_data)
+
+        print("\nReading data from FRAM:")
+        read_data = bs.read_fram(test_address, len(test_data))
+
+        # Verify the read data
+        if read_data == test_data:
+            print("\n✅ Data was written and read correctly!")
+        else:
+            print(f"\n❌ Data mismatch! Expected: {test_data.hex()}, Read: {read_data.hex()}")
+
+        print(f"\n{bs.read_fram_all()}")
+
 
     bs = BlaustahlSRWP(device='/dev/ttyACM0')
-    bs.clear_fram()
+    if not bs.is_fram_empty():
+        c = input("This demo will overwrite FRAM, type 'CONTINUE' to continue: ")
+        if c != "CONTINUE": sys.exit()
 
-    # Echo test
-    bs.echo("This is an echo test")
-
-    # FRAM test: Write and read
-    test_address = 0
-    test_data = b'This is a write test'
-
-    print("\nWriting data to FRAM:")
-    bs.write_fram(test_address, test_data)
-
-    print("\nReading data from FRAM:")
-    read_data = bs.read_fram(test_address, len(test_data))
-
-    # Verify the read data
-    if read_data == test_data:
-        print("\n✅ Data was written and read correctly!")
+        run_test(bs)
     else:
-        print(f"\n❌ Data mismatch! Expected: {test_data.hex()}, Read: {read_data.hex()}")
-
-    print(f"\n{bs.read_fram_all()}")
+        run_test(bs)
