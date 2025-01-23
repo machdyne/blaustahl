@@ -6,7 +6,6 @@
 import serial
 import logging
 import glob
-import time
 
 class BlaustahlSRWP:
     logger = logging.getLogger(__name__)
