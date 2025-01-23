@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 # Python example for using SRWP to communicate with Blaustahl
 # see https://github.com/binqbit/serialport_srwp for protocol details
 
