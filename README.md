@@ -143,8 +143,6 @@ To read or write data to FRAM memory via software, use the built-in API Simple R
 
 See `sw/srwp.py` for an SRWP example using Python.
 
-There is also an existing [drivers](./firmware/srwp/) with SRWP support for [Linux](./firmware/srwp/srwp_linux.uf2) and [Windows](./firmware/srwp/srwp_win.uf2).
-
 ## Firmware
 
 The [firmware](firmware) can be updated over USB by pressing CTRL-Y in the text editor to enter the UF2 bootloader mode. You can also enter the bootloader by holding the button while plugging in the device.
