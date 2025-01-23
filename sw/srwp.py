@@ -80,7 +80,6 @@ class BlaustahlSRWP:
         :param data: Data to write (bytes or bytearray)
         """
         self.flush()
-        time.sleep(0.05)  # Pause to ensure the buffer is ready
 
         ba = bytearray()
         ba.extend(b'\x00')    # Enter SRWP mode
@@ -89,11 +88,8 @@ class BlaustahlSRWP:
         ba.extend(len(data).to_bytes(4, byteorder='little'))    # Data length
         ba.extend(data)    # Add data
 
-        self.logger.debug(f"Send to FRAM: {ba.hex()}")
-
         self.srwp.write(ba)
         self.srwp.flush()
-        time.sleep(0.1)  # Pause to ensure data is written to FRAM
 
     def read_fram_retry(self, addr:int, size:int, max_retries:int=3):
         """
@@ -121,15 +117,12 @@ class BlaustahlSRWP:
             data.extend(chunk)
         return bytes(data)
 
-    def write_fram_all(self, data:bytes|bytearray, chunk_size:int=100):
+    def write_fram_all(self, data:bytes|bytearray):
         """
         Writes the entire content to the FRAM chip.
         :param data: Data to write (must match the size of the FRAM).
         """
-        for offset in range(0, len(data), chunk_size):
-            time.sleep(0.1)  # Pause between chunk writes
-            chunk = data[offset:offset + chunk_size]
-            self.write_fram(offset, chunk)
+        self.write_fram(0, data)
 
     # Helper Functions
     def clear_fram(self):
