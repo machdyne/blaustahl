@@ -6,13 +6,29 @@ import sys
 import time
 import codecs
 import logging
+import glob
 
 class BlaustahlSRWP:
     logger = logging.getLogger(__name__)
 
-    def __init__(self, device:str='/dev/ttyACM0', fram_size:int=8192):
+    def __init__(self, device:str|None='/dev/ttyACM0', fram_size:int=8192):
+        if device is None:
+            device = self.find_device()
+
         self.srwp = serial.Serial(device, 115200, timeout=1, rtscts=False, dsrdtr=False)
         self.fram_size = fram_size
+
+    @staticmethod
+    def find_device():
+        """
+        Finds the first available /dev/ttyACM device.
+        :return: The path to the device as a string.
+        :raises FileNotFoundError: If no device is found.
+        """
+        devices = glob.glob('/dev/ttyACM*')
+        if not devices:
+            raise FileNotFoundError("No /dev/ttyACM device found.")
+        return devices[0]
 
     def flush(self):
         while self.srwp.in_waiting:
@@ -81,7 +97,7 @@ class BlaustahlSRWP:
         Reads the entire content of the FRAM chip.
         :return: All data on the FRAM chip as bytes.
         """
-        return bs.read_fram(0, self.fram_size)
+        return self.read_fram(0, self.fram_size)
 
     def clear_fram(self):
         """
@@ -89,6 +105,14 @@ class BlaustahlSRWP:
         """
         for addr in range(self.fram_size + 1):
             self.write_fram(addr, b'\x00')
+
+    def is_fram_empty(self):
+        """
+        Checks if the entire FRAM is empty (filled with '\x00').
+        :return: True if the FRAM is empty, False otherwise.
+        """
+        data = self.read_fram_all()
+        return all(byte == 0 for byte in data)
 
 # Main program
 if __name__ == "__main__":
