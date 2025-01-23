@@ -116,36 +116,64 @@ class BlaustahlSRWP:
 
 # Main program
 if __name__ == "__main__":
-    def run_test(bs:BlaustahlSRWP):
+    from argparse import ArgumentParser
+
+    parser = ArgumentParser(description="CLI tool for interacting with Blaustahl Storage Device using the SRWP protocol.")
+    parser.add_argument("--device", type=str, default=None, help="Path to the serial device (e.g., /dev/ttyACM0). Defaults to auto-detection.")
+
+    subparsers = parser.add_subparsers(dest="command", help="Available commands")
+
+    # Echo command
+    parser_echo = subparsers.add_parser("echo", help="Echo data back to you over the FRAM")
+    parser_echo.add_argument("message", type=str, help="Message to send and receive as echo")
+
+    # Read command
+    parser_read = subparsers.add_parser("read", help="Read data from FRAM")
+    parser_read.add_argument("address", type=int, help="Address to start reading from")
+    parser_read.add_argument("size", type=int, help="Number of bytes to read")
+
+    # Write command
+    parser_write = subparsers.add_parser("write", help="Write data to FRAM")
+    parser_write.add_argument("address", type=int, help="Address to start writing to")
+    parser_write.add_argument("data", type=str, help="Data to write (as a string)")
+
+    # Clear FRAM command
+    parser_clear = subparsers.add_parser("clear", help="Clear the entire FRAM")
+
+    # Check FRAM empty command
+    parser_check = subparsers.add_parser("check", help="Check if the FRAM is empty")
+
+    args = parser.parse_args()
+
+    # Create an instance of BlaustahlSRWP
+    bs = BlaustahlSRWP(device=args.device)
+
+    # Execute based on the parsed arguments
+    if args.command == "echo":
+        print(f"Echoing: {args.message}")
+        bs.echo(args.message)
+
+    elif args.command == "read":
+        print(f"Reading {args.size} bytes from address {args.address}")
+        data = bs.read_fram(args.address, args.size)
+        print(f"Data: {data}")
+
+    elif args.command == "write":
+        print(f"Writing data to address {args.address}")
+        bs.write_fram(args.address, args.data.encode('ascii'))
+        print("Write complete.")
+
+    elif args.command == "clear":
+        print("Clearing FRAM...")
         bs.clear_fram()
+        print("FRAM cleared.")
 
-        # Echo test
-        bs.echo("This is an echo test")
-
-        # FRAM test: Write and read
-        test_address = 0
-        test_data = b'This is a write test'
-
-        print("\nWriting data to FRAM:")
-        bs.write_fram(test_address, test_data)
-
-        print("\nReading data from FRAM:")
-        read_data = bs.read_fram(test_address, len(test_data))
-
-        # Verify the read data
-        if read_data == test_data:
-            print("\n✅ Data was written and read correctly!")
+    elif args.command == "check":
+        print("Checking if FRAM is empty...")
+        if bs.is_fram_empty():
+            print("FRAM is empty.")
         else:
-            print(f"\n❌ Data mismatch! Expected: {test_data.hex()}, Read: {read_data.hex()}")
+            print("FRAM is not empty.")
 
-        print(f"\n{bs.read_fram_all()}")
-
-
-    bs = BlaustahlSRWP(device='/dev/ttyACM0')
-    if not bs.is_fram_empty():
-        c = input("This demo will overwrite FRAM, type 'CONTINUE' to continue: ")
-        if c != "CONTINUE": sys.exit()
-
-        run_test(bs)
     else:
-        run_test(bs)
+        parser.print_help()
