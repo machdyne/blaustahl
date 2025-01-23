@@ -4,9 +4,6 @@
 # see https://github.com/binqbit/serialport_srwp for protocol details
 
 import serial
-import sys
-import time
-import codecs
 import logging
 import glob
 
