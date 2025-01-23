@@ -114,53 +114,26 @@ class BlaustahlSRWP:
             time.sleep(0.1)  # Short pause before retry
         raise IOError(f"Failed to read {size} bytes from FRAM after {max_retries} attempts")
 
-    def read_fram_all(self):
+    def read_fram_all(self, chunk_size:int=100):
         """
         Reads the entire content of the FRAM chip with retries.
         :return: All data on the FRAM chip as bytes.
         """
         data = bytearray()
-        for offset in range(0, self.fram_size, 256):  # Default chunk size
-            chunk = self.read_fram_retry(offset, min(256, self.fram_size - offset))
+        for offset in range(0, self.fram_size, chunk_size):
+            chunk = self.read_fram_retry(offset, min(chunk_size, self.fram_size - offset))
             data.extend(chunk)
         return bytes(data)
 
-    def write_fram_all(self, data:bytes|bytearray):
+    def write_fram_all(self, data:bytes|bytearray, chunk_size:int=100):
         """
         Writes the entire content to the FRAM chip.
         :param data: Data to write (must match the size of the FRAM).
         """
-        if len(data) != self.fram_size:
-            raise ValueError("Data size must match the size of the FRAM.")
-
-        self.write_fram_in_chunks(0, data)
-
-    def read_fram_in_chunks(self, addr:int, size:int, chunk_size:int=256):
-        """
-        Reads `size` bytes from address `addr` on the FRAM chip in chunks.
-        :param addr: Starting address
-        :param size: Total number of bytes to read
-        :param chunk_size: Size of each chunk to read
-        :return: All data as bytes
-        """
-        data = bytearray()
-        for offset in range(0, size, chunk_size):
-            time.sleep(0.1)  # Pause between chunk reads
-            chunk = self.read_fram(addr + offset, min(chunk_size, size - offset))
-            data.extend(chunk)
-        return bytes(data)
-
-    def write_fram_in_chunks(self, addr:int, data:bytes|bytearray, chunk_size:int=256):
-        """
-        Writes data to the FRAM chip in chunks.
-        :param addr: Starting address
-        :param data: Data to write (bytes or bytearray)
-        :param chunk_size: Size of each chunk to write
-        """
         for offset in range(0, len(data), chunk_size):
             time.sleep(0.1)  # Pause between chunk writes
             chunk = data[offset:offset + chunk_size]
-            self.write_fram(addr + offset, chunk)
+            self.write_fram(offset, chunk)
 
     # Helper Functions
     def clear_fram(self):
