@@ -18,7 +18,6 @@ class BlaustahlSRWP:
             device = self.find_device()
 
         self.srwp = serial.Serial(device, 115200, timeout=1, rtscts=False, dsrdtr=False)
-        self.srwp.flush()
 
     @staticmethod
     def find_device():
@@ -61,7 +60,6 @@ class BlaustahlSRWP:
         :param size: Number of bytes to read
         """
         self.flush()
-        time.sleep(0.05)  # Pause to ensure the buffer is ready
 
         ba = bytearray()
         ba.extend(b'\x00')    # Enter SRWP mode
@@ -71,7 +69,6 @@ class BlaustahlSRWP:
 
         self.srwp.write(ba)
         self.srwp.flush()
-        time.sleep(0.05)  # Pause to allow FRAM to process
 
         data = self.srwp.read(size)
         return data
@@ -98,7 +95,7 @@ class BlaustahlSRWP:
         self.srwp.flush()
         time.sleep(0.1)  # Pause to ensure data is written to FRAM
 
-    def read_fram_retry(self, addr: int, size: int, max_retries: int = 3):
+    def read_fram_retry(self, addr:int, size:int, max_retries:int=3):
         """
         Reads `size` bytes from address `addr` on the FRAM chip with retries.
         :param addr: Starting address
@@ -111,7 +108,6 @@ class BlaustahlSRWP:
             if len(data) == size:
                 return data  # Successful read
             self.logger.warning(f"Incomplete read: Expected {size}, got {len(data)}. Retrying... (Attempt {attempt + 1})")
-            time.sleep(0.1)  # Short pause before retry
         raise IOError(f"Failed to read {size} bytes from FRAM after {max_retries} attempts")
 
     def read_fram_all(self, chunk_size:int=100):
