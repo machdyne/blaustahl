@@ -142,6 +142,18 @@ if __name__ == "__main__":
     # Check FRAM empty command
     parser_check = subparsers.add_parser("check", help="Check if the FRAM is empty")
 
+    # Backup FRAM command
+    parser_backup = subparsers.add_parser("backup", help="Backup the entire FRAM to a file")
+    parser_backup.add_argument("file", type=str, help="File to save the backup")
+
+    # Restore FRAM command
+    parser_restore = subparsers.add_parser("restore", help="Restore the entire FRAM from a file")
+    parser_restore.add_argument("file", type=str, help="File to read the backup from")
+
+    # Verify FRAM command
+    parser_verify = subparsers.add_parser("verify", help="Verify the entire FRAM against a file")
+    parser_verify.add_argument("file", type=str, help="File to verify the FRAM content against")
+
     args = parser.parse_args()
 
     # Create an instance of BlaustahlSRWP
@@ -173,6 +185,15 @@ if __name__ == "__main__":
             print("FRAM is empty.")
         else:
             print("FRAM is not empty.")
+
+    elif args.command == "backup":
+        pass
+
+    elif args.command == "restore":
+        pass
+
+    elif args.command == "verify":
+        pass
 
     else:
         parser.print_help()
