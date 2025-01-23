@@ -2,6 +2,7 @@
 # see https://github.com/binqbit/serialport_srwp for protocol details
 
 import serial
+import sys
 import time
 import codecs
 import logging
@@ -91,6 +92,10 @@ class BlaustahlSRWP:
 
 # Main program
 if __name__ == "__main__":
+
+    c = input("This demo will overwrite FRAM, type 'CONTINUE' to continue: ")
+    if c != "CONTINUE": sys.exit()
+
     bs = BlaustahlSRWP(device='/dev/ttyACM0')
     bs.clear_fram()
 

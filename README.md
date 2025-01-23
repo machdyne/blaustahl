@@ -137,6 +137,13 @@ $ make
 $ sudo make install
 $ sudo bs -r my-backup.bin
 ```
+## API
+
+To read or write data to flash memory via software, use the built-in API Simple Read Write Protocol (SRWP). An example and description of the protocol can be found in this [repository](https://github.com/binqbit/serialport_srwp).
+
+See `sw/srwp.py` for an SRWP example using Python.
+
+There is also an existing [drivers](./firmware/srwp/) with SRWP support for [Linux](./firmware/srwp/srwp_linux.uf2) and [Windows](./firmware/srwp/srwp_win.uf2).
 
 ## Firmware
 
@@ -169,9 +176,6 @@ $ make
 In the event that the USB interface were to become obsolete or the RP2040 were to become non-functional, it should still be possible to recover the FRAM data using a SOP-8 test clip. The FRAM IC is marked "RS64".
 
 One way to achieve this today is to load the Blaustahl firmware onto a Raspberry Pi Pico using the same SPI GPIOs as shown in the schematics, then hold the Blaustahl boot button while attaching a test clip to the FRAM IC. The text editor or 'bs' utility can then be used to recover the FRAM data.
-
-To read or write data to flash memory via software, use the built-in API Simple Read Write Protocol (SRWP). An example and description of the protocol can be found in this [repository](https://github.com/binqbit/serialport_srwp).
-There is also an existing [drivers](./firmware/srwp/) with SRWP support for [Linux](./firmware/srwp/srwp_linux.uf2) and [Windows](./firmware/srwp/srwp_win.uf2).
 
 ## License
 
