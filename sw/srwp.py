@@ -11,11 +11,15 @@ class BlaustahlSRWP:
     logger = logging.getLogger(__name__)
 
     def __init__(self, device:str|None='/dev/ttyACM0', fram_size:int=8192):
+        self.fram_size = fram_size
+
         if device is None:
             device = self.find_device()
 
+        self.connect_over_serial(device)
+
+    def connect_over_serial(self, device:str|None='/dev/ttyACM0'):
         self.srwp = serial.Serial(device, 115200, timeout=1, rtscts=False, dsrdtr=False)
-        self.fram_size = fram_size
 
     @staticmethod
     def find_device():
@@ -86,18 +90,43 @@ class BlaustahlSRWP:
         ba.extend(len(data).to_bytes(4, byteorder='little'))    # Data length
         ba.extend(data)    # Add data
 
-        self.logger.debug(f"Send to FRAM: {ba.hex()}")
-
         self.srwp.write(ba)
         self.srwp.flush()
 
-    def read_fram_all(self):
+    def read_fram_retry(self, addr:int, size:int, max_retries:int=3):
         """
-        Reads the entire content of the FRAM chip.
+        Reads `size` bytes from address `addr` on the FRAM chip with retries.
+        :param addr: Starting address
+        :param size: Total number of bytes to read
+        :param max_retries: Maximum number of retries for incomplete reads
+        :return: All data as bytes
+        """
+        for attempt in range(max_retries):
+            data = self.read_fram(addr, size)
+            if len(data) == size:
+                return data  # Successful read
+            self.logger.warning(f"Incomplete read: Expected {size}, got {len(data)}. Retrying... (Attempt {attempt + 1})")
+        raise IOError(f"Failed to read {size} bytes from FRAM after {max_retries} attempts")
+
+    def read_fram_all(self, chunk_size:int=100):
+        """
+        Reads the entire content of the FRAM chip with retries.
         :return: All data on the FRAM chip as bytes.
         """
-        return self.read_fram(0, self.fram_size)
+        data = bytearray()
+        for offset in range(0, self.fram_size, chunk_size):
+            chunk = self.read_fram_retry(offset, min(chunk_size, self.fram_size - offset))
+            data.extend(chunk)
+        return bytes(data)
 
+    def write_fram_all(self, data:bytes|bytearray):
+        """
+        Writes the entire content to the FRAM chip.
+        :param data: Data to write (must match the size of the FRAM).
+        """
+        self.write_fram(0, data)
+
+    # Helper Functions
     def clear_fram(self):
         """
         Clears the entire FRAM chip.
@@ -112,6 +141,18 @@ class BlaustahlSRWP:
         """
         data = self.read_fram_all()
         return all(byte == 0 for byte in data)
+
+    def verify_fram(self, data:bytes|bytearray):
+        """
+        Verifies if the provided data matches the content of the FRAM.
+        :param data: Data to verify against the FRAM.
+        :return: True if the data matches, False otherwise.
+        """
+        fram_data = self.read_fram_all()
+        for i in range(len(fram_data)):
+            if fram_data[i] != data[i]:
+                self.logger.error(f"Mismatch at byte {i}: FRAM={fram_data[i]:02x}, Backup={data[i]:02x}")
+        return fram_data == data
 
 # Main program
 if __name__ == "__main__":
@@ -141,6 +182,18 @@ if __name__ == "__main__":
 
     # Check FRAM empty command
     parser_check = subparsers.add_parser("check", help="Check if the FRAM is empty")
+
+    # Backup FRAM command
+    parser_backup = subparsers.add_parser("backup", help="Backup the entire FRAM to a file")
+    parser_backup.add_argument("file", type=str, help="File to save the backup")
+
+    # Restore FRAM command
+    parser_restore = subparsers.add_parser("restore", help="Restore the entire FRAM from a file")
+    parser_restore.add_argument("file", type=str, help="File to read the backup from")
+
+    # Verify FRAM command
+    parser_verify = subparsers.add_parser("verify", help="Verify the entire FRAM against a file")
+    parser_verify.add_argument("file", type=str, help="File to verify the FRAM content against")
 
     args = parser.parse_args()
 
@@ -173,6 +226,36 @@ if __name__ == "__main__":
             print("FRAM is empty.")
         else:
             print("FRAM is not empty.")
+
+    elif args.command == "backup":
+        print(f"Backing up FRAM to {args.file}...")
+        data = bs.read_fram_all()
+
+        with open(args.file, 'wb') as f:
+            f.write(data)
+
+        print("Backup complete.")
+
+    elif args.command == "restore":
+        print(f"Restoring FRAM from {args.file}...")
+        with open(args.file, 'rb') as f:
+            data = f.read()
+
+        if len(data) < bs.fram_size:
+            data = data.ljust(bs.fram_size, b'\x00')
+
+        bs.write_fram_all(data)
+        print("Restore complete.")
+
+    elif args.command == "verify":
+        print(f"Verifying FRAM against {args.file}...")
+        with open(args.file, 'rb') as f:
+            data = f.read()
+
+        if bs.verify_fram(data):
+            print("FRAM matches the file.")
+        else:
+            print("FRAM does not match the file.")
 
     else:
         parser.print_help()
