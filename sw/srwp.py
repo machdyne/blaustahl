@@ -16,11 +16,10 @@ class BlaustahlSRWP:
         if device is None:
             device = self.find_device()
 
-        self.device = device
-        self.connect_over_serial()
+        self.connect_over_serial(device)
 
-    def connect_over_serial(self):
-        self.srwp = serial.Serial(self.device, 115200, timeout=1, rtscts=False, dsrdtr=False)
+    def connect_over_serial(self, device:str|None='/dev/ttyACM0'):
+        self.srwp = serial.Serial(device, 115200, timeout=1, rtscts=False, dsrdtr=False)
 
     @staticmethod
     def find_device():
