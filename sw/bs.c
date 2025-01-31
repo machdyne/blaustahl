@@ -243,6 +243,6 @@ uint8_t fram_read_byte(uint16_t addr) {
       &actual, 0);
 	if (debug)
 		printf("read %i bytes [%.2x]\n", actual, buf[0]);
-	if (actual == 64) goto again;
+	if (actual == 0) goto again;
 	return buf[0];
 }
