@@ -27,10 +27,13 @@ class BlaustahlSRWP:
         Finds the first available /dev/ttyACM device.
         :return: The path to the device as a string.
         :raises FileNotFoundError: If no device is found.
+        :raises ValueError: If multiple devices are found.
         """
         devices = glob.glob('/dev/ttyACM*')
         if not devices:
             raise FileNotFoundError("No /dev/ttyACM device found.")
+        elif len(devices) > 1:
+            raise ValueError(f"More than one device found:\n\t{"\n\t".join(devices)}\nPlease specify the correct device with the --devices option.")
         return devices[0]
 
     def flush(self):
