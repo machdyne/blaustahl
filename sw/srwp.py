@@ -170,6 +170,14 @@ class BlaustahlSRWP:
             data = data.ljust(self.fram_size, b'\x00')
         return data
 
+    # General Device Functions - Not used for srwp
+    def dfu_mode(self):
+        ba = bytearray()
+        ba.extend(b'\x19')    # Enter DFU mode
+
+        self.srwp.write(ba)
+        self.srwp.flush()
+
 # Main program
 if __name__ == "__main__":
     from argparse import ArgumentParser
@@ -210,6 +218,9 @@ if __name__ == "__main__":
     # Verify FRAM command
     parser_verify = subparsers.add_parser("verify", help="Verify the entire FRAM against a file")
     parser_verify.add_argument("file", type=str, help="File to verify the FRAM content against")
+
+    # DFU Mode command
+    parser_dfu = subparsers.add_parser("dfu", help="Switch the Blaustahl Storage Device to DFU mode for firmware updates")
 
     args = parser.parse_args()
 
@@ -271,6 +282,10 @@ if __name__ == "__main__":
             print("FRAM matches the file.")
         else:
             print("FRAM does not match the file.")
+
+    elif args.command == "dfu":
+        print("Send into DFU Mode")
+        bs.dfu_mode()
 
     else:
         parser.print_help()
