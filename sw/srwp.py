@@ -157,6 +157,11 @@ class BlaustahlSRWP:
                 self.logger.error(f"Mismatch at byte {i}: FRAM={fram_data[i]:02x}, Data/File={data[i]:02x}")
         return fram_data == data
 
+    def fill_with_null_bytes_to_fit_fram(self, data:bytes|bytearray):
+        if len(data) < self.fram_size:
+            data = data.ljust(self.fram_size, b'\x00')
+        return data
+
 # Main program
 if __name__ == "__main__":
     from argparse import ArgumentParser
@@ -244,8 +249,7 @@ if __name__ == "__main__":
         with open(args.file, 'rb') as f:
             data = f.read()
 
-        if len(data) < bs.fram_size:
-            data = data.ljust(bs.fram_size, b'\x00')
+        data = bs.fill_with_null_bytes_to_fit_fram(data)
 
         bs.write_fram_all(data)
         print("Restore complete.")
