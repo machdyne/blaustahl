@@ -171,6 +171,7 @@ int main(int argc, char *argv[]) {
 			fram_write_byte(i, buf[i]);
 		}
 		printf("done writing.\n");
+		free(buf);
 
 	} else if (mode == MODE_READ) {
 
@@ -198,12 +199,14 @@ int main(int argc, char *argv[]) {
 
 		for (int i = 0; i < BS_FRAM_SIZE; i++) {
 			uint8_t d = fram_read_byte(i);
-			if (d != buf[i]) {
+			if (d != (uint8_t)buf[i]) {
 				printf("mismatch at address 0x%.4x\r\n", i);
+				printf(" %.2x != %.2x\r\n", d, buf[i]);
 				++mismatches;
 			}
 		}
 		printf("%i mismatches.\n", mismatches);
+		free(buf);
 
 	}
 
@@ -235,9 +238,11 @@ uint8_t fram_read_byte(uint16_t addr) {
    int actual;
 	uint8_t buf[64];
 	bsCmd(BS_CMD_READ_BYTE, (addr >> 8) & 0xff, addr & 0xff, 0);
+	again:
    libusb_bulk_transfer(usb_dh, (2 | LIBUSB_ENDPOINT_IN), buf, 64,
       &actual, 0);
 	if (debug)
 		printf("read %i bytes [%.2x]\n", actual, buf[0]);
+	if (actual == 64) goto again;
 	return buf[0];
 }
