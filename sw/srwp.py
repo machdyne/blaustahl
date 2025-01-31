@@ -154,7 +154,7 @@ class BlaustahlSRWP:
         fram_data = self.read_fram_all()
         for i in range(len(fram_data)):
             if fram_data[i] != data[i]:
-                self.logger.error(f"Mismatch at byte {i}: FRAM={fram_data[i]:02x}, Backup={data[i]:02x}")
+                self.logger.error(f"Mismatch at byte {i}: FRAM={fram_data[i]:02x}, Data/File={data[i]:02x}")
         return fram_data == data
 
 # Main program
