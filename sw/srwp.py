@@ -6,6 +6,7 @@
 import serial
 import logging
 import glob
+from serial.serialutil import SerialException
 
 class BlaustahlSRWP:
     logger = logging.getLogger(__name__)
@@ -136,6 +137,21 @@ class BlaustahlSRWP:
         :param data: Data to write (must match the size of the FRAM).
         """
         self.write_fram(0, data)
+
+    def write_chunkks_fram_all(self, data:bytes|bytearray, chunk_size:int=100):
+        """
+        TESTING WRITE!!!!
+
+        Writes the entire content to the FRAM chip in chunks.
+        :param data: Data to write (must match the size of the FRAM).
+        :param chunk_size: Size of each chunk to write.
+        """
+        for offset in range(0, len(data), chunk_size):
+            chunk = data[offset : offset + chunk_size]
+            try:
+                self.write_fram(offset, chunk)
+            except SerialException:
+                self.logger.error(f"Failed to write chunk: {offset} - {chunk}")
 
     # Helper Functions
     def clear_fram(self):
