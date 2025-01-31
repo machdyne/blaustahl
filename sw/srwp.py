@@ -138,7 +138,7 @@ class BlaustahlSRWP:
         """
         self.write_fram(0, data)
 
-    def write_chunkks_fram_all(self, data:bytes|bytearray, chunk_size:int=100):
+    def write_chunks_fram_all(self, data:bytes|bytearray, chunk_size:int=100):
         """
         TESTING WRITE!!!!
 
