@@ -12,6 +12,14 @@ class BlaustahlSRWP:
     logger = logging.getLogger(__name__)
 
     def __init__(self, device:str|None='/dev/ttyACM0', fram_size:int=8192):
+        """
+        Initializes the connection to the Storage device.
+
+        :param device: Serial device path (default: '/dev/ttyACM0'). If None, attempts to auto-detect.
+        :param fram_size: FRAM size in bytes. 
+            - 8192 for Blaustahl Storage Device
+            - 262144 for Kaltstahl Storage Device
+        """
         self.fram_size = fram_size
 
         if device is None:
@@ -50,7 +58,11 @@ class BlaustahlSRWP:
             data = self.srwp.read(4096)
             self.logger.debug(f"Flushed Data: {data}")
 
-    def echo(self, msg):
+    def echo(self, msg:str):
+        """
+        Sends a message to the Device and reads back the response.
+        :param msg: The message to send (ASCII-encoded)
+        """
         self.flush()
 
         ba = bytearray()
