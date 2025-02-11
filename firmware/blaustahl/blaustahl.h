@@ -9,7 +9,7 @@
 
 #include <stdint.h>
 
-#define BLAUSTAHL_VERSION "0.0.7"
+#define BLAUSTAHL_VERSION "0.0.8"
 
 #define PAGES 4
 //#define PAGES 128
