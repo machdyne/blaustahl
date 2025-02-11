@@ -184,6 +184,7 @@ char editor_decode(int addr, char cc) {
 void editor_help(void) {
 
 	mode = MODE_HELP;
+	write_enabled = false;
 
 	printf(VT100_CLEAR_HOME);
 	printf(VT100_ERASE_SCREEN);
@@ -266,9 +267,10 @@ void editor_yield(void) {
 			break;
 
 		case('['):
-			if (state == STATE_ESC0)
+			if (state == STATE_ESC0) {
 				state = STATE_ESC1;
-			break;
+				break;
+			}
 
 		default:
 			if (state == STATE_ESC1) {
