@@ -200,6 +200,7 @@ if __name__ == "__main__":
 
     parser = ArgumentParser(description="CLI tool for interacting with Blaustahl Storage Device using the SRWP protocol.")
     parser.add_argument("--device", type=str, default=None, help="Path to the serial device (e.g., /dev/ttyACM0). Defaults to auto-detection.")
+    parser.add_argument("--fram", type=int, default=8192, help="Size of the FRAM Chip. Defaults to 8192 Bytes")
 
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
 
@@ -241,7 +242,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Create an instance of BlaustahlSRWP
-    bs = BlaustahlSRWP(device=args.device)
+    bs = BlaustahlSRWP(device=args.device, fram_size=args.fram)
 
     # Execute based on the parsed arguments
     if args.command == "echo":
