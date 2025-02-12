@@ -6,11 +6,20 @@
 import serial
 import logging
 import glob
+from serial.serialutil import SerialException
 
 class BlaustahlSRWP:
     logger = logging.getLogger(__name__)
 
     def __init__(self, device:str|None='/dev/ttyACM0', fram_size:int=8192):
+        """
+        Initializes the connection to the Storage device.
+
+        :param device: Serial device path (default: '/dev/ttyACM0'). If None, attempts to auto-detect.
+        :param fram_size: FRAM size in bytes. 
+            - 8192 for Blaustahl Storage Device
+            - 262144 for Kaltstahl Storage Device
+        """
         self.fram_size = fram_size
 
         if device is None:
@@ -19,7 +28,15 @@ class BlaustahlSRWP:
         self.connect_over_serial(device)
 
     def connect_over_serial(self, device:str|None='/dev/ttyACM0'):
-        self.srwp = serial.Serial(device, 115200, timeout=1, rtscts=False, dsrdtr=False)
+        self.srwp = serial.Serial(
+            port=device,
+            baudrate=115200,
+            timeout=1,
+            rtscts=False,
+            dsrdtr=False,
+            parity=serial.PARITY_NONE,
+            stopbits=serial.STOPBITS_ONE
+        )
 
     @staticmethod
     def find_device():
@@ -27,10 +44,13 @@ class BlaustahlSRWP:
         Finds the first available /dev/ttyACM device.
         :return: The path to the device as a string.
         :raises FileNotFoundError: If no device is found.
+        :raises ValueError: If multiple devices are found.
         """
         devices = glob.glob('/dev/ttyACM*')
         if not devices:
             raise FileNotFoundError("No /dev/ttyACM device found.")
+        elif len(devices) > 1:
+            raise ValueError(f"More than one device found:\n\t{"\n\t".join(devices)}\nPlease specify the correct device with the --devices option or by setting the device argument.")
         return devices[0]
 
     def flush(self):
@@ -38,7 +58,11 @@ class BlaustahlSRWP:
             data = self.srwp.read(4096)
             self.logger.debug(f"Flushed Data: {data}")
 
-    def echo(self, msg):
+    def echo(self, msg:str):
+        """
+        Sends a message to the Device and reads back the response.
+        :param msg: The message to send (ASCII-encoded)
+        """
         self.flush()
 
         ba = bytearray()
@@ -126,6 +150,21 @@ class BlaustahlSRWP:
         """
         self.write_fram(0, data)
 
+    def write_chunks_fram_all(self, data:bytes|bytearray, chunk_size:int=100):
+        """
+        TESTING WRITE!!!!
+
+        Writes the entire content to the FRAM chip in chunks.
+        :param data: Data to write (must match the size of the FRAM).
+        :param chunk_size: Size of each chunk to write.
+        """
+        for offset in range(0, len(data), chunk_size):
+            chunk = data[offset : offset + chunk_size]
+            try:
+                self.write_fram(offset, chunk)
+            except SerialException:
+                self.logger.error(f"Failed to write chunk: {offset} - {chunk}")
+
     # Helper Functions
     def clear_fram(self):
         """
@@ -151,8 +190,21 @@ class BlaustahlSRWP:
         fram_data = self.read_fram_all()
         for i in range(len(fram_data)):
             if fram_data[i] != data[i]:
-                self.logger.error(f"Mismatch at byte {i}: FRAM={fram_data[i]:02x}, Backup={data[i]:02x}")
+                self.logger.error(f"Mismatch at byte {i}: FRAM={fram_data[i]:02x}, Data/File={data[i]:02x}")
         return fram_data == data
+
+    def fill_with_null_bytes_to_fit_fram(self, data:bytes|bytearray):
+        if len(data) < self.fram_size:
+            data = data.ljust(self.fram_size, b'\x00')
+        return data
+
+    # General Device Functions - Not used for srwp
+    def dfu_mode(self):
+        ba = bytearray()
+        ba.extend(b'\x19')    # Enter DFU mode
+
+        self.srwp.write(ba)
+        self.srwp.flush()
 
 # Main program
 if __name__ == "__main__":
@@ -160,6 +212,7 @@ if __name__ == "__main__":
 
     parser = ArgumentParser(description="CLI tool for interacting with Blaustahl Storage Device using the SRWP protocol.")
     parser.add_argument("--device", type=str, default=None, help="Path to the serial device (e.g., /dev/ttyACM0). Defaults to auto-detection.")
+    parser.add_argument("--fram", type=int, default=8192, help="Size of the FRAM Chip. Defaults to 8192 Bytes")
 
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
 
@@ -195,10 +248,13 @@ if __name__ == "__main__":
     parser_verify = subparsers.add_parser("verify", help="Verify the entire FRAM against a file")
     parser_verify.add_argument("file", type=str, help="File to verify the FRAM content against")
 
+    # DFU Mode command
+    parser_dfu = subparsers.add_parser("dfu", help="Switch the Blaustahl Storage Device to DFU mode for firmware updates")
+
     args = parser.parse_args()
 
     # Create an instance of BlaustahlSRWP
-    bs = BlaustahlSRWP(device=args.device)
+    bs = BlaustahlSRWP(device=args.device, fram_size=args.fram)
 
     # Execute based on the parsed arguments
     if args.command == "echo":
@@ -241,8 +297,7 @@ if __name__ == "__main__":
         with open(args.file, 'rb') as f:
             data = f.read()
 
-        if len(data) < bs.fram_size:
-            data = data.ljust(bs.fram_size, b'\x00')
+        data = bs.fill_with_null_bytes_to_fit_fram(data)
 
         bs.write_fram_all(data)
         print("Restore complete.")
@@ -256,6 +311,10 @@ if __name__ == "__main__":
             print("FRAM matches the file.")
         else:
             print("FRAM does not match the file.")
+
+    elif args.command == "dfu":
+        print("Send into DFU Mode")
+        bs.dfu_mode()
 
     else:
         parser.print_help()
