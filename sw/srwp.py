@@ -50,7 +50,11 @@ class BlaustahlSRWP:
         if not devices:
             raise FileNotFoundError("No /dev/ttyACM device found.")
         elif len(devices) > 1:
-            raise ValueError(f"More than one device found:\n\t{"\n\t".join(devices)}\nPlease specify the correct device with the --devices option or by setting the device argument.")
+            msg = 'More than one device found:'
+            for device in devices:
+                msg += f'\n\t {device}'
+            msg += '\nPlease specify the correct device with the --devices option or by setting the device argument.'
+            raise ValueError(msg)
         return devices[0]
 
     def flush(self):
