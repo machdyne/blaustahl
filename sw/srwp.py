@@ -117,6 +117,19 @@ class BlaustahlSRWP:
         self.srwp.write(ba)
         self.srwp.flush()
 
+    def read_fram_size(self):
+        self.flush()
+
+        ba = bytearray()
+        ba.extend(b'\x00')    # Enter SRWP mode
+        ba.extend(b'\x0a')    # Command: Read FRAM size
+
+        self.srwp.write(ba)
+        self.srwp.flush()
+
+        data = self.srwp.read(4)
+        return data
+
     def read_fram_retry(self, addr:int, size:int, max_retries:int=3):
         """
         Reads `size` bytes from address `addr` on the FRAM chip with retries.
@@ -230,6 +243,9 @@ if __name__ == "__main__":
     parser_write.add_argument("address", type=int, help="Address to start writing to")
     parser_write.add_argument("data", type=str, help="Data to write (as a string)")
 
+    # Read device info
+    parser_clear = subparsers.add_parser("info", help="Read device info")
+
     # Clear FRAM command
     parser_clear = subparsers.add_parser("clear", help="Clear the entire FRAM")
 
@@ -275,6 +291,11 @@ if __name__ == "__main__":
         print("Clearing FRAM...")
         bs.clear_fram()
         print("FRAM cleared.")
+
+    elif args.command == "info":
+        print(f"Reading device info")
+        size = int.from_bytes(bs.read_fram_size(), "little")
+        print(f"Size: {size}")
 
     elif args.command == "check":
         print("Checking if FRAM is empty...")

@@ -10,9 +10,10 @@
 #include "srwp.h"
 #include "fram.h"
 
-#define CMD_TEST 0
-#define CMD_READ 1
-#define CMD_WRITE 2
+#define CMD_TEST	0x00
+#define CMD_READ	0x01
+#define CMD_WRITE	0x02
+#define CMD_SIZE	0x0a
 
 int cdc_read_byte(void) {
     uint8_t buf[1];
@@ -129,6 +130,13 @@ void cmd_write(void) {
     }
 }
 
+void cmd_size(void) {
+   uint32_t size = FRAM_SIZE;
+   uint8_t buf[4];
+   memcpy(buf, &size, 4);
+   cdc_write_buf(buf, 4);
+}
+
 void srwp(void) {
 	blaustahl_led(LED_IDLE);
 
@@ -147,6 +155,11 @@ void srwp(void) {
         case CMD_WRITE:
             blaustahl_led(LED_WRITE);
             cmd_write();
+            break;
+
+        case CMD_SIZE:
+            blaustahl_led(LED_READ);
+            cmd_size();
             break;
 
         default:

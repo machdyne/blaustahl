@@ -16,6 +16,7 @@
 #define ROWS 24
 #define COLS 80
 #define PAGE_SIZE (ROWS * COLS)
+#define PAGES (FRAM_AVAILABLE / PAGE_SIZE)
 
 #define VT100_CURSOR_UP			"\e[A"
 #define VT100_CURSOR_DOWN		"\e[B"
@@ -71,7 +72,7 @@ const char help_password[] =
 	"\r\n";
 
 const char help_editor[] =
-	"COMMANDS:\r\n"
+	"\r\nCOMMANDS:\r\n"
 	"\r\n"
 	"CTRL-G    HELP\r\n"
 	"CTRL-L    REFRESH SCREEN\r\n"
@@ -194,6 +195,8 @@ void editor_help(void) {
 #else
 	printf(blaustahl_banner, BLAUSTAHL_VERSION, "COMPOSITE");
 #endif
+
+	printf("FRAM size: %i bytes (%i pages)\r\n", FRAM_SIZE, PAGES);
 
 	printf(help_editor);
 	printf(help_press_any_key);

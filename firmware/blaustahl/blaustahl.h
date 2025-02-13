@@ -9,11 +9,17 @@
 
 #include <stdint.h>
 
-#define BLAUSTAHL_VERSION "0.0.8"
+#define BLAUSTAHL_VERSION "0.0.9"
 
-#define PAGES 4
-//#define PAGES 128
-//#define FRAM_BIG
+#define FRAM_SIZE 8192		// 8KB
+//#define FRAM_SIZE 262144	// 256KB
+
+#define FRAM_METADATA 512	// reserved for encryption
+#define FRAM_AVAILABLE (FRAM_SIZE - FRAM_METADATA)
+
+#if FRAM_SIZE >= 262144
+ #define FRAM_BIG
+#endif
 
 int cdc_getchar(void);
 void cdc_putchar(const char ch);
