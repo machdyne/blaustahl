@@ -11,7 +11,7 @@ from serial.serialutil import SerialException
 class BlaustahlSRWP:
     logger = logging.getLogger(__name__)
 
-    def __init__(self, device:str|None='/dev/ttyACM0', fram_size:int=8192):
+    def __init__(self, device:str|None='/dev/ttyACM0', fram_size:int|None=None):
         """
         Initializes the connection to the Storage device.
 
@@ -20,12 +20,17 @@ class BlaustahlSRWP:
             - 8192 for Blaustahl Storage Device
             - 262144 for Kaltstahl Storage Device
         """
-        self.fram_size = fram_size
-
         if device is None:
             device = self.find_device()
 
         self.connect_over_serial(device)
+
+        # Set FRAM Size Manuelly from User or else get it directly from Storage Device
+        if fram_size:
+            self.fram_size = fram_size
+        else:
+            self.read_fram_size()
+            self.fram_size = int.from_bytes(self.read_fram_size(), "little")
 
     def connect_over_serial(self, device:str|None='/dev/ttyACM0'):
         self.srwp = serial.Serial(
@@ -229,7 +234,7 @@ if __name__ == "__main__":
 
     parser = ArgumentParser(description="CLI tool for interacting with Blaustahl Storage Device using the SRWP protocol.")
     parser.add_argument("--device", type=str, default=None, help="Path to the serial device (e.g., /dev/ttyACM0). Defaults to auto-detection.")
-    parser.add_argument("--fram", type=int, default=8192, help="Size of the FRAM Chip. Defaults to 8192 Bytes")
+    parser.add_argument("--fram", type=int, default=None, help="Size of the FRAM Chip. Defaults to 8192 Bytes")
 
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
 
