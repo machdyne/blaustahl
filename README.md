@@ -62,8 +62,6 @@ $ screen /dev/tty.usbmodem1234561
 
 3. Open PuTTY and set connection type to Serial. Enter COMx (e.g. COM4) in the serial line box and press the Open button.
 
-Note: The default firmware on older devices isn't recognized by Windows, if that is the case please [update your firmware](#firmware) to [blaustahl_cdconly.uf2](firmware) in order to access Blaustahl from Windows. If you ordered Blaustahl recently the cdc\_only firmware will be installed by default and should be recognized by Windows.
-
 ### Nix Flake Support
 
 For users who prefer Nix, a [Nix Flake](https://nixos.wiki/wiki/Flakes) is now available to simplify building and using Blaustahl's firmware and utility tools. This section offers an alternative method that does not replace the existing instructions for non-Nix environments.
@@ -115,7 +113,7 @@ Blaustahl includes a built-in text editor with four 80x24 pages of text. The cur
 
 ## Software
 
-The 'bs' utility program can be used to read and write the FRAM data. Note that it's not possible to use this utility with the cdconly firmware, please install the composite firmware (blaustahl.uf2) in order to use the `bs` utility.
+The 'bs' utility program can be used to read and write the FRAM data. Note that it's not possible to use this utility with the cdconly firmware, please install the composite firmware (blaustahl-x.x.x.uf2) in order to use the `bs` utility.
 
 Build and install:
 
@@ -151,10 +149,10 @@ Once in bootloader mode, you can update the firmware by dragging and dropping a 
 
 There are two firmware images available:
 
-  * blaustahl.uf2: USB composite device with USB-CDC and vendor interface
-  * blaustahl\_cdconly.uf2: USB-CDC simple device
+  * blaustahl-x.x.x.uf2: USB composite device with USB-CDC and vendor interface
+  * blaustahl\_cdconly-x.x.x.uf2: USB-CDC simple device
 
-Blaustahl ships with blaustahl\_cdconly.uf2 installed.
+Blaustahl ships with `ship/blaustahl\_cdconly.uf2` installed.
 
 The vendor interface allows you to access the 'bs' utility and to develop custom
 software that interfaces with Blaustahl.
