@@ -124,8 +124,6 @@ The viewer is read-only. To edit a flash file, use the CLI's `te` command instea
 
 Blaustahl has a small flash filesystem, separate from FRAM/SRAM, for storing files — text, Scheme programs, or anything else that fits. Selecting **FILES** from the menu (or pressing CTRL-F) lists what's stored there; select a file to open it in the viewer.
 
-Deleting, renaming, formatting, and saving a FRAM snapshot are all done from the CLI (see below), since those are the kind of actions worth typing out deliberately rather than triggering with a single keystroke.
-
 ## The CLI
 
 Selecting **CLI** from the menu drops you into a command line. Type `help` for the full list at any time.
