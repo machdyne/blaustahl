@@ -214,7 +214,7 @@ $ make
 If you'd like to pre-load files onto the flash filesystem as part of a build (rather than uploading them one at a time with `xmodem_up` afterward), `tools/mkimage` builds a littlefs image from a directory of files:
 
 ```
-$ tools/mkimage /tmp/blaustahl/dist/ littlefs.bin
+$ tools/mkimage dist/ littlefs.bin
 ```
 
 Write it to the device with [picotool](https://github.com/raspberrypi/picotool), alongside the normal firmware, while the device is in bootloader mode:
