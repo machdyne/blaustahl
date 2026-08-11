@@ -194,6 +194,8 @@ SRWP operates below the encryption layer described above — it always reads and
 
 Run **`firmware_update`** from the CLI to enter USB bootloader mode (this asks for confirmation first, since anything not yet committed will be lost). You can also hold the button on the device while plugging it in. Once in bootloader mode, update the firmware by dragging and dropping a new `.uf2` file onto the device, which will appear as a USB drive.
 
+If you're developing the Blaustahl firmware, you can use `cmake -DDEV ..` to enable CTRL-Y as an alternative option for quickly switching to bootloader mode.
+
 Blaustahl ships with `ship/blaustahl_cdconly.uf2` installed — a simple USB-CDC (serial) device, which is what makes it work with an ordinary terminal program on any platform with no special drivers.
 
 ### Building from source
