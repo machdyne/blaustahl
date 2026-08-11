@@ -107,7 +107,7 @@ The status bar (bottom line) always shows which file you're editing, the current
 
 ## The file viewer
 
-Selecting a file from FILES (or the VIEWER menu item, if you've already opened one) shows it read-only, in the same TEXT/HEX display as the grid editor, but scrolling smoothly instead of paging — useful for files larger than 7,680 bytes.
+The file viewer can view text files stored in flash.
 
 | Keypress | Action |
 | -------- | ------ |
@@ -116,7 +116,7 @@ Selecting a file from FILES (or the VIEWER menu item, if you've already opened o
 | HOME | Jump to the start of the file |
 | CTRL-C | Copy, same mechanism as the grid editor |
 
-Copying in the viewer and the grid editor share one buffer, so you can copy a range from a file and paste it directly into FRAM or SRAM, or the other way around.
+Copying in the viewer and the grid editor share one buffer, so you can copy a range from a file and paste it directly into FRAM or SRAM.
 
 The viewer is read-only. To edit a flash file, use the CLI's `te` command instead (see below).
 
