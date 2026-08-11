@@ -1,29 +1,8 @@
-// Simple Read Write Protocol (SRWP) for FRAM
-/*
-Test: 0, 0, len:int, data:byte[]
-Read: 0, 1, addr:int, len:int
-Write: 0, 2, addr:int, len:int, data:byte[]
-*/
+#ifndef SRWP_H_
+#define SRWP_H_
 
-#include <stdio.h>
-#include <stdbool.h>
-#include <string.h>
-
-#include "pico/bootrom.h"
-#include "tusb.h"
-
-#include "blaustahl.h"
-#include "fram.h"
-
-#define CMD_READ 1
-#define CMD_WRITE 2
-
-int cdc_read_cmd(void);
-int cdc_read_addr(void);
-int cdc_read_len(void);
-int cdc_read_buf(uint8_t *buf, int len);
-void cdc_write_buf(uint8_t *buf, int length);
-void fram_read_buf(uint8_t *buf, int addr, int len);
-void fram_write_buf(uint8_t *buf, int addr, int len);
+// Simple Read/Write Protocol -- see srwp() in srwp.c, and docs/srwp.md
+// for the full protocol description, hardening notes, and rationale.
 void srwp(void);
 
+#endif

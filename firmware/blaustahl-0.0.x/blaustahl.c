@@ -115,16 +115,6 @@ int main(void) {
 	// init hardware
 	init_blaustahl();
 
-	// arm this core (core0) as a lockout "victim" so that core1 -- where
-	// the CLI's format command and FRAM snapshot actually run -- can
-	// safely pause core0 via flash_safe_execute() during a flash erase/
-	// program. Without this, flash_safe_execute() has no way to stop
-	// core0 from fetching instructions out of flash (XIP) while the
-	// chip is mid-erase, which can hang or crash the device. Must be
-	// called before core1 is launched below. See flash_storage.c for
-	// the full explanation.
-	multicore_lockout_victim_init();
-
 	// start editor on second core
    multicore_reset_core1();
    multicore_launch_core1(core1_main);
@@ -177,37 +167,6 @@ void cdc_putchar(const char ch) {
 		tud_cdc_write_char(ch);
 		tud_cdc_write_flush();
 	}
-}
-
-// like cdc_putchar(), but waits (briefly, bounded) for FIFO space
-// instead of silently dropping the byte if none is available right
-// now. cdc_putchar()'s drop-on-full behavior is exactly right for
-// echoing single keystrokes -- losing one occasionally is harmless,
-// and blocking forever there could hang the whole UI if the host
-// isn't reading. But a sender writing many bytes back-to-back in a
-// tight loop with no pauses (XMODEM's block transmission is the one
-// place in this firmware that does that -- 133 bytes per block, no
-// delay between them) can genuinely outrun the host's USB polling
-// and fill that same FIFO mid-write; a single dropped byte there
-// corrupts that block's framing entirely, which running was the
-// actual cause of transfers that silently never completed. Returns
-// false (rather than hanging indefinitely) if the host stops reading
-// altogether -- e.g. disconnected mid-transfer -- so the caller can
-// abort cleanly instead of blocking forever.
-bool cdc_putchar_reliable(const char ch) {
-
-	if (!tud_cdc_connected()) return false;
-
-	absolute_time_t deadline = make_timeout_time_ms(1000);
-
-	while (!tud_cdc_write_available()) {
-		if (time_reached(deadline)) return false;
-	}
-
-	tud_cdc_write_char(ch);
-	tud_cdc_write_flush();
-	return true;
-
 }
 
 // control LED

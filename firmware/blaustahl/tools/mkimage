@@ -1,0 +1,101 @@
+#!/bin/sh
+#
+# mkimage -- builds a littlefs image pre-populated with files from a
+# directory, ready to write directly onto the device's flash at the
+# correct offset, alongside the normal firmware UF2.
+#
+# Usage: mkimage <files-dir> [output.bin]
+#
+#   <files-dir>   directory of files to pre-load into the flash
+#                 filesystem. Flat/non-recursive -- subdirectories are
+#                 skipped with a clear explanation, matching how this
+#                 firmware's own flash file listing works (no
+#                 directory support there either). Filenames must be
+#                 under 32 characters (STORAGE_NAME_LEN) or they're
+#                 skipped with a warning.
+#   [output.bin]  where to write the image (default: littlefs.bin)
+#
+# Deliberately does NOT wrap the result in a UF2 or combine it with the
+# firmware UF2 -- earlier versions of this script did that, but the
+# RP2040 bootrom has a confirmed silicon erratum (RP2040-E14) with UF2
+# files that contain multiple address regions separated by a gap,
+# where the region after the gap can silently fail to write via the
+# BOOTSEL drag-and-drop mechanism. picotool sidesteps this entirely by
+# talking to the device's PICOBOOT USB interface directly rather than
+# going through the same vulnerable UF2-interception code path, so
+# flashing the firmware and the littlefs image as two separate
+# picotool invocations is both simpler AND more reliable than trying
+# to build one combined file:
+#
+#   picotool load build/blaustahl.uf2          # normal firmware, as always
+#   picotool load littlefs.bin -t bin -o 0x10200000 -v
+#
+# 0x10200000 = 0x10000000 (RP2040 XIP base) + 0x200000 (this project's
+# FLASH_TARGET_OFFSET, from flash_storage.c). If that offset or the
+# partition size ever changes, update FS_TARGET_ADDR below too.
+#
+# Requires gcc (already needed to build the firmware itself) to build
+# mklfsimg the first time this runs -- it links the EXACT SAME
+# littlefs source this firmware itself uses (lfs.c/lfs.h, from the
+# project's existing littlefs/ submodule -- this script expects to
+# live in a directory next to it, e.g. firmware/blaustahl/tools/
+# alongside firmware/blaustahl/littlefs/), with the exact same
+# block_size/prog_size/block_count/block_cycles as flash_storage.c's
+# real partition config -- so the resulting image is guaranteed
+# mountable by the real firmware, not just "should be compatible."
+# Verified by mounting a generated image back with real littlefs and
+# confirming byte-exact file content.
+FS_TARGET_ADDR=0x10200000
+
+set -e
+
+SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+BUILD_DIR="$SCRIPT_DIR/.mkimage_build"
+
+FILES_DIR="$1"
+OUTPUT_BIN="${2:-littlefs.bin}"
+
+if [ -z "$FILES_DIR" ]; then
+	echo "usage: $0 <files-dir> [output.bin]" >&2
+	exit 1
+fi
+if [ ! -d "$FILES_DIR" ]; then
+	echo "error: '$FILES_DIR' is not a directory" >&2
+	exit 1
+fi
+
+mkdir -p "$BUILD_DIR"
+
+LITTLEFS_DIR="$SCRIPT_DIR/../littlefs"
+if [ ! -f "$LITTLEFS_DIR/lfs.c" ]; then
+	echo "error: littlefs submodule not found at '$LITTLEFS_DIR'" >&2
+	echo "  this script expects to live in a 'tools/' directory next to it" >&2
+	echo "  (e.g. firmware/blaustahl/tools/mkimage, firmware/blaustahl/littlefs/)" >&2
+	exit 1
+fi
+
+if [ ! -x "$BUILD_DIR/mklfsimg" ] || [ "$SCRIPT_DIR/mklfsimg.c" -nt "$BUILD_DIR/mklfsimg" ]; then
+	echo "building mklfsimg..."
+	gcc -O2 -DLFS_NO_DEBUG -DLFS_NO_WARN -DLFS_NO_ERROR \
+		-I "$LITTLEFS_DIR" \
+		-o "$BUILD_DIR/mklfsimg" \
+		"$SCRIPT_DIR/mklfsimg.c" "$LITTLEFS_DIR/lfs.c" "$LITTLEFS_DIR/lfs_util.c"
+fi
+
+echo ""
+echo "=== building littlefs image from '$FILES_DIR' ==="
+"$BUILD_DIR/mklfsimg" "$FILES_DIR" "$OUTPUT_BIN"
+
+echo ""
+echo "wrote $OUTPUT_BIN"
+echo ""
+echo "To flash: first flash the firmware normally (however you usually do --"
+echo "BOOTSEL drag-and-drop or 'picotool load build/blaustahl.uf2' both work"
+echo "fine for the firmware alone, it's a single contiguous region), then:"
+echo ""
+echo "  picotool load $OUTPUT_BIN -t bin -o $FS_TARGET_ADDR -v"
+echo ""
+echo "The device must be in BOOTSEL mode for this (hold BOOTSEL while"
+echo "plugging in). -v verifies the write immediately by reading it back,"
+echo "so you'll get a direct pass/fail instead of having to guess from"
+echo "whether the file browser shows anything afterward."

@@ -1,0 +1,9 @@
+[submodule "firmware/blaustahl/littlefs"]
+	path = firmware/blaustahl/littlefs
+	url = https://github.com/littlefs-project/littlefs.git
+[submodule "firmware/blaustahl/te"]
+	path = firmware/blaustahl/te
+	url = https://github.com/machdyne/te.git
+[submodule "firmware/blaustahl/ms"]
+	path = firmware/blaustahl/ms
+	url = https://github.com/machdyne/ms.git
