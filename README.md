@@ -200,7 +200,7 @@ Blaustahl ships with `ship/blaustahl_cdconly.uf2` installed — a simple USB-CDC
 
 ### Building from source
 
-Most people won't need to do this — pre-built firmware is available in [Releases](releases). If you'd like to build it yourself and have [pico-sdk](https://github.com/raspberrypi/pico-sdk) installed:
+If you'd like to build the firmware yourself and have [pico-sdk](https://github.com/raspberrypi/pico-sdk) installed:
 
 ```
 $ git submodule update --init --recursive
