@@ -80,7 +80,7 @@ Press **CTRL-T**, **ESC-ESC**, or a single **ESC** (pause briefly) to open it fr
 - **FILES** — browse and manage files on the flash filesystem.
 - **CLI** — a command-line interface, including a full Scheme programming environment.
 - **HELP** — the same help screen as CTRL-G.
-- **MODE: TEXT / HEX** — switches how the grid editor and viewer display data.
+- **MODE: TEXT / HEX** — switches how the grid editor displays data.
 
 Pressing **CTRL-F** from anywhere jumps straight to FILES, skipping the menu.
 
@@ -161,7 +161,7 @@ The interpreter comes with a standard library (`map`, `reduce`, `filter`, `sort`
 
 ## Transferring files
 
-Blaustahl supports the standard XMODEM/CRC protocol for moving data to and from your computer, using any XMODEM-capable terminal program (minicom, Tera Term, and others all work).
+Blaustahl supports the standard XMODEM protocol for moving data to and from your computer, using any XMODEM-capable terminal program.
 
 - **`xmodem_up <filename>`** receives a file from your computer and saves it to the flash filesystem. Start the command on the device, then start your terminal's "send file" (XMODEM) action.
 - **`xmodem_down <filename>`** sends a flash file to your computer the same way, in reverse.
