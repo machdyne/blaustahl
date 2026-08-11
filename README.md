@@ -1,6 +1,6 @@
 # Blaustahl Storage Device
 
-The Blaustahl USB dongle provides long-term storage for 7,680 characters of text, backed by non-volatile FRAM memory — no batteries, no wear-out from repeated writes, and no risk of losing data if the device is unplugged. Simply plug it into your computer and open any serial communications program that supports VT100 emulation (PuTTY, Tera Term, Minicom, screen, etc.) to access the built-in interface.
+The Blaustahl USB dongle provides long-term storage for 7,680 characters of text, backed by non-volatile FRAM memory — no batteries, no wear-out from repeated writes, and no risk of losing data if the device is unplugged. Simply plug it into your computer and open any serial communications program that supports VT100 emulation (PuTTY, Tera Term, Minicom, screen, etc.) to access the built-in editor.
 
 Beyond the FRAM editor, Blaustahl also includes a small flash filesystem for storing files, a file browser and viewer, a built-in text editor, password-protected encryption, file transfer over XMODEM, and a full Scheme programming environment — all accessible over the same USB serial connection, no drivers or extra software required.
 
