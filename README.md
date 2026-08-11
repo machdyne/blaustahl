@@ -224,6 +224,8 @@ $ picotool load build/blaustahl_cdconly.uf2
 $ picotool load littlefs.bin -t bin -o 0x10200000 -v
 ```
 
+We provide an example `littlefs.bin` containing a subset of the [Ark Codex](https://github.com/machdyne/ark) as well as other documentation.
+
 The `-v` verifies the write by reading it back immediately. Two separate `picotool load` calls, not a combined file — a real RP2040 bootrom erratum (RP2040-E14) can silently drop part of a UF2 that spans multiple, non-adjacent regions, and `picotool` avoids it entirely by writing directly rather than going through that code path.
 
 ## Future data recovery
