@@ -66,7 +66,7 @@ fi
 
 mkdir -p "$BUILD_DIR"
 
-LITTLEFS_DIR="$SCRIPT_DIR/../littlefs"
+LITTLEFS_DIR="$SCRIPT_DIR/../firmware/blaustahl/littlefs"
 if [ ! -f "$LITTLEFS_DIR/lfs.c" ]; then
 	echo "error: littlefs submodule not found at '$LITTLEFS_DIR'" >&2
 	echo "  this script expects to live in a 'tools/' directory next to it" >&2
