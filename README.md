@@ -10,7 +10,7 @@ This repo contains schematics, PCB layouts, firmware, and a 3D-printable case.
 
 Find purchasing information on the [Blaustahl product page](https://machdyne.com/product/blaustahl-storage-device/).
 
-> **This is an early beta of firmware v0.10.0.** Most features described here are stable and well-tested, but as with any beta, please back up anything important and report anything that looks wrong.
+> **This is an early beta of firmware v0.1.0.** Most features described here are stable and well-tested, but as with any beta, please back up anything important and report anything that looks wrong. See firmware-0.0.x for the old firmware.
 
 ## Connecting Blaustahl
 
