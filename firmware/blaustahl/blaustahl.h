@@ -9,7 +9,7 @@
 
 #include <stdint.h>
 
-#define BLAUSTAHL_VERSION "0.1.0"
+#define BLAUSTAHL_VERSION "0.1.1"
 
 #define FRAM_SIZE 8192		// 8KB
 //#define FRAM_SIZE 262144	// 256KB
@@ -21,8 +21,16 @@
  #define FRAM_BIG
 #endif
 
+#include <stdbool.h>
+
 int cdc_getchar(void);
+// Drops the character if the CDC transmit FIFO is full -- right for
+// echoing a keystroke. Anything written in bulk (a screen, a line, a
+// transfer) must use cdc_putchar_reliable(), which waits (bounded,
+// 1 s) for space: a host that polls less often than a PC's -- or is
+// just busy -- otherwise loses whatever overflows the 64-byte FIFO.
 void cdc_putchar(const char ch);
+bool cdc_putchar_reliable(const char ch);
 
 void blaustahl_led(uint16_t intensity);
 void blaustahl_dfu(void);

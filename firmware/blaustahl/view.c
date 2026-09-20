@@ -146,7 +146,7 @@ static long draw_one_line(long offset, int phys_row) {
 
 		bool hl = in_selection(offset + (long)i);
 		if (hl) printf(VT100_SGR_REVERSE);
-		cdc_putchar(printable_or_dot(buf[i]));
+		cdc_putchar_reliable(printable_or_dot(buf[i]));
 		if (hl) printf(VT100_SGR_RESET);
 
 	}

@@ -308,7 +308,7 @@ static void draw_text_page(void) {
 			char pc = (col < (int)got) ? buf[col] : 0x00;
 			bool hl = in_copy_selection(row_start + col);
 			if (hl) printf(VT100_SGR_REVERSE);
-			cdc_putchar(printable_or_dot(pc));
+			cdc_putchar_reliable(printable_or_dot(pc));
 			if (hl) printf(VT100_SGR_RESET);
 		}
 
@@ -348,7 +348,7 @@ static void draw_hex_page(void) {
 			char pc = (i < (int)got) ? (char)buf[i] : ' ';
 			bool hl = in_copy_selection(row_start + i);
 			if (hl) printf(VT100_SGR_REVERSE);
-			cdc_putchar(printable_or_dot(pc));
+			cdc_putchar_reliable(printable_or_dot(pc));
 			if (hl) printf(VT100_SGR_RESET);
 		}
 

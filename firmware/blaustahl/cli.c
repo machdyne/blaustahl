@@ -762,7 +762,7 @@ void cli_redraw(void) {
 			// same reasoning as everywhere else this comes up
 			printf("\r\n...........");
 		} else {
-			cdc_putchar(masked ? '*' : line[i]);
+			cdc_putchar_reliable(masked ? '*' : line[i]);
 		}
 	}
 
